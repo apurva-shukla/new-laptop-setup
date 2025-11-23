@@ -27,3 +27,12 @@ alias lg="lazygit"
 
 # Node Version Manager
 eval "$(fnm env --use-on-cd)"
+
+# Safety: Use 'del' to move to Trash instead of 'rm' (permanent delete)
+alias del="trash"
+
+# Prompt before deleting more than 3 files or recursive delete
+alias rm="rm -i"
+
+# Add local binaries (needed for uv, pipx, etc)
+export PATH="$HOME/.local/bin:$PATH"
