@@ -1,0 +1,20 @@
+# ~/.config/starship.toml
+
+# Add a blank line between command output and the next prompt
+add_newline = true
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[directory]
+style = "bold blue"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+style = "bold purple"
+symbol = " "
+
+[package]
+disabled = true

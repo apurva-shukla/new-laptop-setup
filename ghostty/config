@@ -1,0 +1,35 @@
+working-directory = /Users/ashukla/Documents
+window-inherit-working-directory = false
+# --- Visuals & Theme ---
+# "catppuccin-mocha" is a very popular, high-contrast pastel dark theme
+theme = catppuccin-mocha
+
+# Ghostty ships with JetBrains Mono built-in, which is excellent
+font-family = "JetBrains Mono"
+font-size = 14
+# Enable ligatures (makes arrows like => look like one symbol)
+font-feature = +calt
+
+# --- Window Aesthetics (The "Glass" Look) ---
+# Slight transparency with blur looks very native on macOS
+background-opacity = 0.90
+background-blur-radius = 20
+
+# Add breathing room between the window edge and the text
+window-padding-x = 10
+window-padding-y = 10
+window-padding-balance = true
+
+# --- Minimalist UI (Yabai Style) ---
+# Hides the macOS title bar (stoplights). 
+# Since you use Yabai, you don't need the title bar taking up space.
+macos-titlebar-style = hidden
+
+# --- Cursor ---
+cursor-style = block
+cursor-style-blink = true
+shell-integration-features = cursor
+
+# --- Mouse ---
+# Hides mouse when you start typing so it doesn't block code
+mouse-hide-while-typing = true

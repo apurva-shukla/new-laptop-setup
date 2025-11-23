@@ -44,9 +44,7 @@ yabai -m rule --add app="^Cursor$"                        space=three
 yabai -m rule --add app="^(Zen|Zen Browser)$"             space=four
 yabai -m rule --add app="^Messages$"                      space=four
 yabai -m rule --add app="^Spotify$"                       space=four
-yabai -m rule --add app="^WhatsApp$"                      space=four
-yabai -m rule --add app=".*WhatsApp$" space=four
-yabai -m rule --add app="^[^[:print:]]*WhatsApp$"         space=four
+yabai -m rule --add app="^WhatsApp$" space=four
 
 # Space 5
 yabai -m rule --add app="^Firefox$"                       space=five
