@@ -14,3 +14,13 @@ source <(fzf --zsh)
 
 # Initialize Zoxide (better cd)
 eval "$(zoxide init zsh)"
+
+# Modern ls replacement
+alias ls="eza --icons --group-directories-first"
+alias ll="eza --icons --group-directories-first -l"
+
+# Modern cat replacement
+alias cat="bat"
+
+# Lazygit
+alias lg="lazygit"
