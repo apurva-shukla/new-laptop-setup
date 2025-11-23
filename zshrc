@@ -1,4 +1,4 @@
-alias docs="cd ~/Documents"
+alias dev="cd ~/Developer"
 alias reload="source ~/.zshrc"
 # --- Starship Prompt (Makes the path/git look cool) ---
 eval "$(starship init zsh)"
