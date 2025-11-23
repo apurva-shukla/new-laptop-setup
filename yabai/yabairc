@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Reserve space for SketchyBar (height 40 at top)
-yabai -m config external_bar all:40:0
+# yabai -m config external_bar all:40:0
 
 # Use BSP tiling layout
 yabai -m config layout bsp
@@ -32,7 +32,6 @@ yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 # Send certain apps to specific labeled spaces (that you created with --label)
 # Space 1
 yabai -m rule --add app="^Google Chrome$"                 space=one
-yabai -m rule --add app="^Finder$"                        space=one
 yabai -m rule --add app="^(zoom\.us|Zoom|Zoom Workplace)$" space=one
 
 # Space 2
@@ -53,7 +52,7 @@ yabai -m rule --add app="^[^[:print:]]*WhatsApp$"         space=four
 yabai -m rule --add app="^Firefox$"                       space=five
  
 # Padding and gaps
-yabai -m config top_padding    2
+yabai -m config top_padding    0
 yabai -m config bottom_padding 2
 yabai -m config left_padding   4
 yabai -m config right_padding  4
