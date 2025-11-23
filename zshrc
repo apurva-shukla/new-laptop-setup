@@ -24,3 +24,6 @@ alias cat="bat"
 
 # Lazygit
 alias lg="lazygit"
+
+# Node Version Manager
+eval "$(fnm env --use-on-cd)"

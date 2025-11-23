@@ -33,3 +33,14 @@ shell-integration-features = cursor
 # --- Mouse ---
 # Hides mouse when you start typing so it doesn't block code
 mouse-hide-while-typing = true
+
+# --- macOS Muscle Memory ---
+keybind = cmd+right=text:\x05
+keybind = cmd+left=text:\x01
+keybind = alt+left=esc:b
+keybind = alt+right=esc:f
+keybind = cmd+backspace=text:\x15
+# This one makes Cmd+Delete (Forward delete) clear to end of line
+keybind = cmd+delete=text:\x0b
+# This one makes Option+Backspace delete the word to the left
+keybind = alt+backspace=text:\x17
