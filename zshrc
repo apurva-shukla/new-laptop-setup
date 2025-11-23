@@ -8,3 +8,9 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 
 # --- Auto Suggestions (Grey ghost text history) ---
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Setup FZF (allows Ctrl+R to fuzzy search history)
+source <(fzf --zsh)
+
+# Initialize Zoxide (better cd)
+eval "$(zoxide init zsh)"
