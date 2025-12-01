@@ -17,6 +17,7 @@ yabai -m space 5 --label five
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Rippling$" manage=off
+yabai -m rule --add app="^Reminders$" manage=off
 yabai -m rule --add app="^Raycast$" manage=off
 yabai -m rule --add app="^BetterTouchTool$" manage=off
 yabai -m rule --add app="^BTT$" manage=off
@@ -44,21 +45,20 @@ yabai -m rule --add app="^Cursor$"                        space=three
 yabai -m rule --add app="^(Zen|Zen Browser)$"             space=four
 yabai -m rule --add app="^Messages$"                      space=four
 yabai -m rule --add app="^Spotify$"                       space=four
-yabai -m rule --add app="^WhatsApp$" space=four
 
 # Space 5
 yabai -m rule --add app="^Firefox$"                       space=five
  
 # Padding and gaps
 yabai -m config top_padding    0
-yabai -m config bottom_padding 2
+yabai -m config bottom_padding 4
 yabai -m config left_padding   4
 yabai -m config right_padding  4
 yabai -m config window_gap     4
 
 # after your labels, before or after the rules is fine
-yabai -m signal --add event=window_created app=".*WhatsApp$" \
-  action="yabai -m window --space four"
+# yabai -m signal --add event=window_created app=".*WhatsApp$" \
+#   action="yabai -m window --space four"
 
 # Mouse modifier (hold fn + drag to move/resize)
 yabai -m config mouse_modifier fn
