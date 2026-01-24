@@ -15,12 +15,16 @@ yabai -m space 5 --label five
 
 # Disable files from being managed by yabai
 yabai -m rule --add app="^System Settings$" manage=off
-yabai -m rule --add app="^Finder$" manage=off
-yabai -m rule --add app="^Rippling$" manage=off
+# yabai -m rule --add app="^Finder$" manage=off
+# yabai -m rule --add app="^Rippling$" manage=off
 yabai -m rule --add app="^Reminders$" manage=off
 yabai -m rule --add app="^Raycast$" manage=off
+yabai -m rule --add app="^Loom$" manage=off
+yabai -m rule --add app="^Screenstudio$" manage=off
 yabai -m rule --add app="^BetterTouchTool$" manage=off
 yabai -m rule --add app="^BTT$" manage=off
+yabai -m rule --add app="^Shottr$" manage=off
+yabai -m rule --add app="^Shottr.cc$" manage=off
 yabai -m rule --add app="^Voiceink$" manage=off
 yabai -m rule --add app="^Activity Monitor$" manage=off
 
@@ -30,24 +34,24 @@ yabai -m config window_placement second_child
 yabai -m signal --add event=window_created  action="yabai -m space --balance"
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 
-# Send certain apps to specific labeled spaces (that you created with --label)
-# Space 1
-yabai -m rule --add app="^Google Chrome$"                 space=one
-yabai -m rule --add app="^(zoom\.us|Zoom|Zoom Workplace)$" space=one
+# # Send certain apps to specific labeled spaces (that you created with --label)
+# # Space 1
+# yabai -m rule --add app="^Google Chrome$"                 space=one
+# yabai -m rule --add app="^(zoom\.us|Zoom|Zoom Workplace)$" space=one
 
-# Space 2
-yabai -m rule --add app="^Slack$"                         space=two
+# # Space 2
+# yabai -m rule --add app="^Slack$"                         space=two
 
-# Space 3
-yabai -m rule --add app="^Cursor$"                        space=three
+# # Space 3
+# yabai -m rule --add app="^Cursor$"                        space=three
 
-# Space 4  (WhatsApp handled above with 2 rules)
-yabai -m rule --add app="^(Zen|Zen Browser)$"             space=four
-yabai -m rule --add app="^Messages$"                      space=four
-yabai -m rule --add app="^Spotify$"                       space=four
+# # Space 4  (WhatsApp handled above with 2 rules)
+# yabai -m rule --add app="^(Zen|Zen Browser)$"             space=four
+# yabai -m rule --add app="^Messages$"                      space=four
+# yabai -m rule --add app="^Spotify$"                       space=four
 
-# Space 5
-yabai -m rule --add app="^Firefox$"                       space=five
+# # Space 5
+# yabai -m rule --add app="^Firefox$"                       space=five
  
 # Padding and gaps
 yabai -m config top_padding    0

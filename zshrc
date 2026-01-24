@@ -1,5 +1,7 @@
+# === PERSONAL CUSTOMIZATIONS ===
 alias dev="cd ~/Developer"
 alias reload="source ~/.zshrc"
+
 # --- Starship Prompt (Makes the path/git look cool) ---
 eval "$(starship init zsh)"
 
@@ -25,9 +27,6 @@ alias cat="bat"
 # Lazygit
 alias lg="lazygit"
 
-# Node Version Manager
-eval "$(fnm env --use-on-cd)"
-
 # Safety: Use 'del' to move to Trash instead of 'rm' (permanent delete)
 alias del="trash"
 
@@ -36,3 +35,10 @@ alias rm="rm -i"
 
 # Add local binaries (needed for uv, pipx, etc)
 export PATH="$HOME/.local/bin:$PATH"
+
+# === SUMBLE SETUP SCRIPT WILL ADD BELOW ===
+# The following will be added by `source <(curl -fsSL https://setup.sumble.com)`:
+# - pyenv + pyenv-virtualenv (Python version management)
+# - nvm (Node version management)
+# - gcloud SDK
+# - sumble CLI

@@ -1,0 +1,36 @@
+[user]
+    # Your DEFAULT identity (Personal)
+    name = Apurva Shukla
+	email = 64269276+apurva-shukla@users.noreply.github.com
+
+# CONDITION: If inside 'sumble-github', switch email
+[includeIf "gitdir:~/Developer/sumble-github/"]
+    path = ~/.gitconfig-work
+
+# CONDITION: If inside 'personal-github', ensure personal email (Safety net)
+[includeIf "gitdir:~/Developer/personal-github/"]
+    path = ~/.gitconfig-personal
+
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true    # use n and N to move between diff sections
+    light = false      # set to true if you're in a light terminal theme
+    line-numbers = true
+    side-by-side = true # This looks amazing on a wide monitor
+
+    # Catppuccin Mocha Theme for Delta
+    # (Matches your Ghostty theme perfectly)
+    syntax-theme = Catppuccin Mocha
