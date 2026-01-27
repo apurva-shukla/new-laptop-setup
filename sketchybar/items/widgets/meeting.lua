@@ -4,13 +4,13 @@ local settings = require("settings")
 local meeting = sbar.add("item", "widgets.meeting", {
     position = "right",
     icon = {
-        string = "",  -- NerdFont calendar icon
+        string = "\u{f133}",  -- NerdFont calendar icon
         font = {
             family = settings.font_icon.text,
             style = settings.font_icon.style_map["Bold"],
             size = settings.icon_size,
         },
-        color = colors.yellow,
+        color = colors.gmail_red,
         padding_left = settings.padding.icon_label_item.icon.padding_left,
         padding_right = settings.padding.icon_label_item.icon.padding_right,
     },
@@ -149,22 +149,10 @@ local function update_meeting()
 
                 local relative = get_relative_time(diff_mins)
 
-                -- Try to extract names from title
-                local names = extract_names_from_title(title)
-                local label = ""
-
-                if names then
-                    label = names .. " (" .. relative .. ")"
-                else
-                    -- Use title if no names found
-                    if #title > 20 then
-                        title = title:sub(1, 17) .. "..."
-                    end
-                    label = title .. " (" .. relative .. ")"
-                end
+                local label = title .. " (" .. relative .. ")"
 
                 -- Color based on urgency
-                local icon_color = colors.yellow
+                local icon_color = colors.gmail_red
                 if diff_mins <= 5 then
                     icon_color = colors.red
                 elseif diff_mins <= 15 then

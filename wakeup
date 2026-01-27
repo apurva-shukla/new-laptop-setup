@@ -1,0 +1,4 @@
+#!/bin/bash
+# Restart sketchybar after waking from sleep
+sleep 2
+/opt/homebrew/bin/brew services restart sketchybar

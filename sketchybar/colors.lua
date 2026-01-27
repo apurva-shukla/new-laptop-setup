@@ -5,6 +5,7 @@ return {
     text = 0xffbbbbbb,  -- Softer white for labels (80% brightness)
     red = 0xfffc5d7c,
     red_bright = 0xe0f38ba8,
+    gmail_red = 0xffea4335,
     green = 0xff9ed072,
     blue = 0xff76cce0,
     blue_bright = 0xe089b4fa,

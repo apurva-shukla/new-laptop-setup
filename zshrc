@@ -1,6 +1,9 @@
 # === PERSONAL CUSTOMIZATIONS ===
-alias dev="cd ~/Developer"
+alias dev="cd ~/code"
 alias reload="source ~/.zshrc"
+
+# Ensure sketchybar is running after login
+pgrep -x sketchybar > /dev/null || brew services restart sketchybar
 
 # --- Starship Prompt (Makes the path/git look cool) ---
 eval "$(starship init zsh)"
