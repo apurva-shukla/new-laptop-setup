@@ -1,5 +1,6 @@
-working-directory = /Users/ashukla/Developer
+working-directory = /Users/apurvashukla/code
 window-inherit-working-directory = false
+command = /opt/homebrew/bin/tmux new-session -A -s main
 # --- Visuals & Theme ---
 # "catppuccin-mocha" is a very popular, high-contrast pastel dark theme
 theme = catppuccin-mocha

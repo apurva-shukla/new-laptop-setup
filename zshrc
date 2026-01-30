@@ -30,6 +30,9 @@ alias cat="bat"
 # Lazygit
 alias lg="lazygit"
 
+# Zed editor (VS Code muscle memory)
+alias code="zed"
+
 # Safety: Use 'del' to move to Trash instead of 'rm' (permanent delete)
 alias del="trash"
 

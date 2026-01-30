@@ -1,22 +1,26 @@
 #!/bin/sh
 
-# Reserve space for SketchyBar (height 40 at top)
-# yabai -m config external_bar all:40:0
+# Load scripting addition (requires SIP partially disabled)
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# Reserve space for SketchyBar (height + margin + padding)
+yabai -m config external_bar all:45:0
 
 # Use BSP tiling layout
 yabai -m config layout bsp
 
 # Label spaces
-yabai -m space 1 --label one
-yabai -m space 2 --label two
-yabai -m space 3 --label three
-yabai -m space 4 --label four
-yabai -m space 5 --label five
+yabai -m space 1 --label chrome
+yabai -m space 2 --label slack
+yabai -m space 3 --label flex1
+yabai -m space 4 --label flex2
+yabai -m space 5 --label zen
+yabai -m space 6 --label messaging
 
-# Disable files from being managed by yabai
+# Disable apps from being managed by yabai (floating)
 yabai -m rule --add app="^System Settings$" manage=off
-# yabai -m rule --add app="^Finder$" manage=off
-# yabai -m rule --add app="^Rippling$" manage=off
+yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Reminders$" manage=off
 yabai -m rule --add app="^Raycast$" manage=off
 yabai -m rule --add app="^Loom$" manage=off
@@ -25,7 +29,7 @@ yabai -m rule --add app="^BetterTouchTool$" manage=off
 yabai -m rule --add app="^BTT$" manage=off
 yabai -m rule --add app="^Shottr$" manage=off
 yabai -m rule --add app="^Shottr.cc$" manage=off
-yabai -m rule --add app="^Voiceink$" manage=off
+yabai -m rule --add app="^VoiceInk$" manage=off
 yabai -m rule --add app="^Activity Monitor$" manage=off
 
 yabai -m config window_placement second_child
@@ -34,24 +38,26 @@ yabai -m config window_placement second_child
 yabai -m signal --add event=window_created  action="yabai -m space --balance"
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 
-# # Send certain apps to specific labeled spaces (that you created with --label)
-# # Space 1
-# yabai -m rule --add app="^Google Chrome$"                 space=one
-# yabai -m rule --add app="^(zoom\.us|Zoom|Zoom Workplace)$" space=one
+# Send apps to specific spaces and focus that space
+# Space 1 - Chrome
+yabai -m rule --add app="^Google Chrome$" space=1
+yabai -m signal --add event=window_created app="^Google Chrome$" action="yabai -m space --focus 1"
 
-# # Space 2
-# yabai -m rule --add app="^Slack$"                         space=two
+# Space 2 - Slack
+yabai -m rule --add app="^Slack$" space=2
+yabai -m signal --add event=window_created app="^Slack$" action="yabai -m space --focus 2"
 
-# # Space 3
-# yabai -m rule --add app="^Cursor$"                        space=three
+# Space 3 & 4 - Flex (no rules, open anything here)
 
-# # Space 4  (WhatsApp handled above with 2 rules)
-# yabai -m rule --add app="^(Zen|Zen Browser)$"             space=four
-# yabai -m rule --add app="^Messages$"                      space=four
-# yabai -m rule --add app="^Spotify$"                       space=four
+# Space 5 - Zen
+yabai -m rule --add app="^(Zen|Zen Browser)$" space=5
+yabai -m signal --add event=window_created app="^(Zen|Zen Browser)$" action="yabai -m space --focus 5"
 
-# # Space 5
-# yabai -m rule --add app="^Firefox$"                       space=five
+# Space 6 - Messaging
+yabai -m rule --add app="WhatsApp$" space=6
+yabai -m rule --add app="^Messages$" space=6
+yabai -m signal --add event=window_created app="WhatsApp$" action="yabai -m space --focus 6"
+yabai -m signal --add event=window_created app="^Messages$" action="yabai -m space --focus 6"
  
 # Padding and gaps
 yabai -m config top_padding    0
@@ -59,10 +65,6 @@ yabai -m config bottom_padding 4
 yabai -m config left_padding   4
 yabai -m config right_padding  4
 yabai -m config window_gap     4
-
-# after your labels, before or after the rules is fine
-# yabai -m signal --add event=window_created app=".*WhatsApp$" \
-#   action="yabai -m window --space four"
 
 # Mouse modifier (hold fn + drag to move/resize)
 yabai -m config mouse_modifier fn

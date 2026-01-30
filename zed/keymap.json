@@ -1,0 +1,50 @@
+[
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      // Split navigation (vim style)
+      "ctrl-h": "pane::ActivatePreviousItem",
+      "ctrl-l": "pane::ActivateNextItem",
+
+      // Leader key bindings (space as leader)
+      "space f": "file_finder::Toggle",
+      "space p": "command_palette::Toggle",
+      "space t": "terminal_panel::ToggleFocus",
+      "space e": "project_panel::ToggleFocus",
+      "space s": "pane::DeploySearch",
+      "space b": "tab_switcher::Toggle",
+      "space w": "pane::CloseActiveItem",
+      "space /": "editor::ToggleComments",
+
+      // Window splits
+      "space v": "pane::SplitRight",
+      "space h": "pane::SplitDown",
+
+      // Navigate between panes
+      "space j": "workspace::ActivatePaneLeft",
+      "space l": "workspace::ActivatePaneRight",
+      "space k": "workspace::ActivatePaneDown",
+      "space i": "workspace::ActivatePaneUp"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == visual",
+    "bindings": {
+      "space /": "editor::ToggleComments"
+    }
+  },
+  {
+    "context": "Dock || Terminal || ProjectPanel",
+    "bindings": {
+      "escape": "workspace::ToggleLeftDock",
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-`": "terminal_panel::ToggleFocus"
+    }
+  }
+]

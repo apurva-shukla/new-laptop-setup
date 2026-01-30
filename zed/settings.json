@@ -1,0 +1,83 @@
+{
+  // === THEME (Match Ghostty/tmux) ===
+  "theme": "Catppuccin Frappé",
+
+  // === FONT (Match Ghostty) ===
+  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_size": 14,
+  "buffer_font_features": {
+    "calt": true,
+  },
+  "ui_font_family": "JetBrains Mono",
+  "ui_font_size": 13,
+
+  // === MINIMALIST UI (Match Yabai aesthetic) ===
+  "tab_bar": {
+    "show": true,
+    "show_nav_history_buttons": false,
+  },
+  "toolbar": {
+    "breadcrumbs": true,
+    "quick_actions": false,
+  },
+  "scrollbar": {
+    "show": "auto",
+  },
+  "gutter": {
+    "line_numbers": true,
+    "code_actions": false,
+    "runnables": false,
+    "folds": true,
+  },
+
+  // === VIM MODE (Your navigation style) ===
+  "vim_mode": true,
+  "relative_line_numbers": "enabled",
+  "cursor_blink": true,
+
+  // === TERMINAL (Inherits your shell setup) ===
+  "terminal": {
+    "font_family": "JetBrains Mono",
+    "font_size": 14,
+    "blinking": "on",
+    "shell": {
+      "program": "/bin/zsh",
+    },
+  },
+
+  // === EDITOR FEEL ===
+  "soft_wrap": "editor_width",
+  "show_whitespaces": "selection",
+  "vertical_scroll_margin": 8,
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000,
+    },
+  },
+
+  // === FILE HANDLING ===
+  "format_on_save": "on",
+  "remove_trailing_whitespace_on_save": true,
+  "ensure_final_newline_on_save": true,
+
+  // === PROJECT PANEL (Like eza style) ===
+  "project_panel": {
+    "dock": "left",
+    "git_status": true,
+    "indent_size": 16,
+    "auto_reveal_entries": true,
+  },
+
+  // === INLINE COMPLETIONS (AI) ===
+  "features": {
+    "edit_prediction_provider": "copilot",
+  },
+
+  // === GIT INTEGRATION (You use lazygit, so minimal) ===
+  "git": {
+    "git_gutter": "tracked_files",
+    "inline_blame": {
+      "enabled": false,
+    },
+  },
+}

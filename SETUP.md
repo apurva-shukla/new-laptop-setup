@@ -10,7 +10,7 @@
 
 2. **Clone this repo and run Brewfile**
    ```bash
-   cd ~/Developer/personal-github/new-laptop-setup
+   cd ~/code/personal/new-laptop-setup
    brew bundle
    ```
 
@@ -21,18 +21,16 @@
 
 4. **Set up symlinks for configs**
    ```bash
-   ln -sf ~/Developer/personal-github/new-laptop-setup/ghostty ~/.config/ghostty
-   ln -sf ~/Developer/personal-github/new-laptop-setup/skhd ~/.config/skhd
-   ln -sf ~/Developer/personal-github/new-laptop-setup/yabai ~/.config/yabai
-   ln -sf ~/Developer/personal-github/new-laptop-setup/starship/starship.toml ~/.config/starship.toml
-   ln -sf ~/Developer/personal-github/new-laptop-setup/sketchybar ~/.config/sketchybar
+   ln -sf ~/code/personal/new-laptop-setup/ghostty ~/.config/ghostty
+   ln -sf ~/code/personal/new-laptop-setup/skhd ~/.config/skhd
+   ln -sf ~/code/personal/new-laptop-setup/yabai ~/.config/yabai
+   ln -sf ~/code/personal/new-laptop-setup/starship/starship.toml ~/.config/starship.toml
+   ln -sf ~/code/personal/new-laptop-setup/sketchybar ~/.config/sketchybar
    ```
 
-5. **Copy git configs**
+5. **Copy git config**
    ```bash
    cp gitconfig ~/.gitconfig
-   cp gitconfig-personal ~/.gitconfig-personal
-   cp gitconfig-work ~/.gitconfig-work
    ```
 
 6. **Start yabai and skhd**

@@ -48,7 +48,23 @@ ctrl + alt + cmd - j : yabai -m window --resize right:-40:0
 # restart yabai
 ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
 
-# NOTE: Moving windows between spaces and destroying spaces requires SIP to be
-# partially disabled. Use macOS native shortcuts or BetterTouchTool instead:
-# - System Settings → Keyboard → Keyboard Shortcuts → Mission Control
-# - ctrl+1-5 to switch spaces, ctrl+shift+1-5 to move windows (built-in)
+# switch to space (Cmd + number)
+cmd - 1 : yabai -m space --focus 1
+cmd - 2 : yabai -m space --focus 2
+cmd - 3 : yabai -m space --focus 3
+cmd - 4 : yabai -m space --focus 4
+cmd - 5 : yabai -m space --focus 5
+cmd - 6 : yabai -m space --focus 6
+
+# switch to prev/next space (Ctrl + arrows)
+ctrl - left : yabai -m space --focus prev
+ctrl - right : yabai -m space --focus next
+
+# move window to space (Shift + Cmd + number)
+shift + cmd - 1 : yabai -m window --space 1; yabai -m space --focus 1
+shift + cmd - 2 : yabai -m window --space 2; yabai -m space --focus 2
+shift + cmd - 3 : yabai -m window --space 3; yabai -m space --focus 3
+shift + cmd - 4 : yabai -m window --space 4; yabai -m space --focus 4
+shift + cmd - 5 : yabai -m window --space 5; yabai -m space --focus 5
+shift + cmd - 6 : yabai -m window --space 6; yabai -m space --focus 6
+

@@ -1,16 +1,6 @@
 [user]
-    # Your DEFAULT identity (Personal)
     name = Apurva Shukla
-	email = 64269276+apurva-shukla@users.noreply.github.com
-
-# CONDITION: If inside 'sumble-github', switch email
-[includeIf "gitdir:~/Developer/sumble-github/"]
-    path = ~/.gitconfig-work
-
-# CONDITION: If inside 'personal-github', ensure personal email (Safety net)
-[includeIf "gitdir:~/Developer/personal-github/"]
-    path = ~/.gitconfig-personal
-
+    email = 64269276+apurva-shukla@users.noreply.github.com
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
