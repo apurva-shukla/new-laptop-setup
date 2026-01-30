@@ -26,6 +26,8 @@
    ln -sf ~/code/personal/new-laptop-setup/yabai ~/.config/yabai
    ln -sf ~/code/personal/new-laptop-setup/starship/starship.toml ~/.config/starship.toml
    ln -sf ~/code/personal/new-laptop-setup/sketchybar ~/.config/sketchybar
+   ln -sf ~/code/personal/new-laptop-setup/tmux/tmux.conf ~/.tmux.conf
+   ln -sf ~/code/personal/new-laptop-setup/zed ~/.config/zed
    ```
 
 5. **Copy git config**
