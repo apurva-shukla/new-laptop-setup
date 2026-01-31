@@ -1,67 +1,20 @@
 local colors = require("colors")
 local settings = require("settings")
-local icons = require("icons")
-local app_icons = require("helpers.app_icons")
 
--- Number of spaces to display (matching yabairc)
-local SPACE_COUNT = 6
+-- Number of spaces to display (max spaces shown in bar)
+local SPACE_COUNT = 10
 
 -- Track space items
 local spaces = {}
 
--- Query yabai for windows and update space labels with app icons
--- NOTE: This only updates labels (app icons), NOT highlight state
--- Highlight is handled automatically by associated_space + space_change event
+-- Path to update script (handles both icon text and colors)
+local CONFIG_DIR = os.getenv("HOME") .. "/.config/sketchybar"
+local UPDATE_SCRIPT = CONFIG_DIR .. "/plugins/update_space_colors.sh"
+
+-- Update space icons and colors via shell script
+-- (Lua set() is unreliable for icon/color changes)
 local function update_space_icons()
-    sbar.exec("yabai -m query --windows", function(windows_json)
-        if not windows_json then return end
-
-        local json_str = tostring(windows_json)
-        if json_str == "" or json_str == "nil" then return end
-
-        -- Group windows by space using pattern matching
-        local windows_by_space = {}
-        for i = 1, SPACE_COUNT do
-            windows_by_space[i] = {}
-        end
-
-        -- Parse each window entry
-        for app, space in string.gmatch(json_str, '"app"%s*:%s*"([^"]+)".-"space"%s*:%s*(%d+)') do
-            local space_num = tonumber(space)
-            if space_num and space_num >= 1 and space_num <= SPACE_COUNT then
-                table.insert(windows_by_space[space_num], app)
-            end
-        end
-
-        -- Update each space's label with app icons
-        for i = 1, SPACE_COUNT do
-            local apps = windows_by_space[i]
-
-            if #apps > 0 then
-                -- Build icon string from app names
-                local icon_line = ""
-                for _, app_name in ipairs(apps) do
-                    local icon = app_icons[app_name] or app_icons["Default"] or ":default:"
-                    icon_line = icon_line .. icon
-                end
-
-                spaces[i]:set({
-                    label = {
-                        string = icon_line,
-                        drawing = true,
-                    },
-                })
-            else
-                -- No windows - hide label
-                spaces[i]:set({
-                    label = {
-                        string = "",
-                        drawing = false,
-                    },
-                })
-            end
-        end
-    end)
+    sbar.exec(UPDATE_SCRIPT)
 end
 
 -- Mouse click handler
