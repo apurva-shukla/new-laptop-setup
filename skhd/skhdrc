@@ -56,9 +56,9 @@ cmd - 4 : yabai -m space --focus 4
 cmd - 5 : yabai -m space --focus 5
 cmd - 6 : yabai -m space --focus 6
 
-# switch to prev/next space (Ctrl + arrows)
-ctrl - left : yabai -m space --focus prev
-ctrl - right : yabai -m space --focus next
+# switch to prev/next occupied space (Ctrl + arrows) - skips empty spaces
+ctrl - left : ~/.config/skhd/focus_prev_occupied.sh
+ctrl - right : ~/.config/skhd/focus_next_occupied.sh
 
 # move window to space (Shift + Cmd + number)
 shift + cmd - 1 : yabai -m window --space 1; yabai -m space --focus 1
