@@ -100,7 +100,7 @@ end
 
 local function update_meeting()
     -- Get title and datetime separately for cleaner parsing
-    sbar.exec([[icalBuddy -n -nc -nrd -li 1 -tf '%H:%M' -df '%Y-%m-%d' -iep "title,datetime" -b "" -ps "|||" eventsFrom:now to:'now+48h' 2>/dev/null | head -1]], function(result)
+    sbar.exec([[icalBuddy -n -nc -nrd -ea -li 1 -tf '%H:%M' -df '%Y-%m-%d' -iep "title,datetime" -b "" -ps "|||" eventsFrom:now to:'now+48h' 2>/dev/null | head -1]], function(result)
         if result == "" or result == nil then
             meeting:set({ drawing = false })
             return
