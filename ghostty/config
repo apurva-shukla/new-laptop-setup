@@ -5,8 +5,11 @@ command = /opt/homebrew/bin/tmux new-session -A -s main
 # "catppuccin-mocha" is a very popular, high-contrast pastel dark theme
 theme = catppuccin-mocha
 
-# Ghostty ships with JetBrains Mono built-in, which is excellent
-font-family = "JetBrains Mono"
+# CommitMono — neutral, anonymous programming typeface
+font-family = "CommitMono"
+font-family-bold = "CommitMono"
+font-family-italic = "CommitMono"
+font-family-bold-italic = "CommitMono"
 font-size = 14
 # Enable ligatures (makes arrows like => look like one symbol)
 font-feature = +calt

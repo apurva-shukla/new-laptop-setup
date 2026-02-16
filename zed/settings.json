@@ -3,12 +3,12 @@
   "theme": "Catppuccin Frappé",
 
   // === FONT (Match Ghostty) ===
-  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_family": "CommitMono",
   "buffer_font_size": 14,
   "buffer_font_features": {
     "calt": true,
   },
-  "ui_font_family": "JetBrains Mono",
+  "ui_font_family": "CommitMono",
   "ui_font_size": 13,
 
   // === MINIMALIST UI (Match Yabai aesthetic) ===
@@ -37,7 +37,7 @@
 
   // === TERMINAL (Inherits your shell setup) ===
   "terminal": {
-    "font_family": "JetBrains Mono",
+    "font_family": "CommitMono",
     "font_size": 14,
     "blinking": "on",
     "shell": {
