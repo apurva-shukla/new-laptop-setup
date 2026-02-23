@@ -18,6 +18,7 @@ font-feature = +calt
 # Slight transparency with blur looks very native on macOS
 background-opacity = 0.90
 background-blur-radius = 20
+unfocused-split-opacity = 0.85
 
 # Add breathing room between the window edge and the text
 window-padding-x = 10
