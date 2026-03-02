@@ -49,12 +49,18 @@ local function is_package_line(line)
     return true
 end
 
+local brew_running = false
+
 local function update_brew(env)
-    local brew_cmd = '/bin/zsh -c "brew outdated -q"'
+    if brew_running then return end
+    brew_running = true
+
+    local brew_cmd = '/bin/zsh -c "HOMEBREW_NO_AUTO_UPDATE=1 brew outdated -q"'
 
     -- print("[BREW OUTDATED] Running command: " .. brew_cmd)
 
     sbar.exec(brew_cmd, function(outdated_output)
+        brew_running = false
         -- print("[BREW OUTDATED] Cmd Output: " .. outdated_output)
 
         -- Clear and rebuild cache

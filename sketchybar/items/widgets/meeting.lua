@@ -98,9 +98,15 @@ local function extract_names_from_title(title)
     return nil
 end
 
+local meeting_running = false
+
 local function update_meeting()
+    if meeting_running then return end
+    meeting_running = true
+
     -- Get title and datetime separately for cleaner parsing
     sbar.exec([[icalBuddy -n -nc -nrd -ea -li 1 -tf '%H:%M' -df '%Y-%m-%d' -iep "title,datetime" -b "" -ps "|||" eventsFrom:now to:'now+48h' 2>/dev/null | head -1]], function(result)
+        meeting_running = false
         if result == "" or result == nil then
             meeting:set({ drawing = false })
             return

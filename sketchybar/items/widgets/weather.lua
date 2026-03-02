@@ -68,9 +68,15 @@ sbar.add("item", "widgets.weather.padding", {
     width = settings.group_paddings
 })
 
+local weather_running = false
+
 local function update_weather()
+    if weather_running then return end
+    weather_running = true
+
     -- Using wttr.in for weather data (free, no API key needed)
-    sbar.exec("curl -s 'wttr.in/" .. LOCATION .. "?format=%t+%C' 2>/dev/null", function(result)
+    sbar.exec("curl -s --connect-timeout 5 --max-time 10 'wttr.in/" .. LOCATION .. "?format=%t+%C' 2>/dev/null", function(result)
+        weather_running = false
         if result and result ~= "" then
             -- Parse temperature and condition
             local temp = result:match("([%+%-]?%d+°[CF])")

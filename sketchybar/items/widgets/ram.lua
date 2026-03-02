@@ -4,7 +4,7 @@ local settings = require("settings")
 
 local ram = sbar.add("item", "widgets.ram", {
     position = "right",
-    update_freq = 2,
+    update_freq = 10,
     icon = {
         string = icons.ram,
         font = {
@@ -27,8 +27,14 @@ local ram = sbar.add("item", "widgets.ram", {
     },
 })
 
+local ram_running = false
+
 ram:subscribe({ "routine", "forced" }, function(env)
+    if ram_running then return end
+    ram_running = true
+
     sbar.exec("memory_pressure", function(output)
+        ram_running = false
         -- Parse memory pressure output to calculate RAM usage
         local pages_free = output:match("Pages free:%s+(%d+)")
         local pages_active = output:match("Pages active:%s+(%d+)")

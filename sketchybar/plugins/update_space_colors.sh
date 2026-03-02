@@ -20,17 +20,20 @@ get_short_name() {
     esac
 }
 
-# Get data once
-SPACE_COUNT=$(yabai -m query --spaces 2>/dev/null | jq 'length // 0')
-[ "$SPACE_COUNT" -gt 10 ] && SPACE_COUNT=10
-[ "$SPACE_COUNT" -eq 0 ] && exit 0
+# Get data once — exit silently if yabai is unavailable or returns bad JSON
+spaces_json=$(yabai -m query --spaces 2>/dev/null) || exit 0
+SPACE_COUNT=$(echo "$spaces_json" | jq 'length // 0' 2>/dev/null) || exit 0
+[ -z "$SPACE_COUNT" ] || [ "$SPACE_COUNT" = "null" ] && exit 0
+[ "$SPACE_COUNT" -gt 10 ] 2>/dev/null && SPACE_COUNT=10
+[ "$SPACE_COUNT" -eq 0 ] 2>/dev/null && exit 0
 
 # Get all apps per space in one jq call: "space:app" per line
 # Filter out minimized and hidden windows (but keep windows on non-active spaces)
-space_apps=$(yabai -m query --windows 2>/dev/null | jq -r '
+windows_json=$(yabai -m query --windows 2>/dev/null) || exit 0
+space_apps=$(echo "$windows_json" | jq -r '
   [.[] | select(."is-minimized" == false and ."is-hidden" == false)]
   | group_by(.space) | .[] | "\(.[0].space):\(.[0].app)"
-')
+' 2>/dev/null) || exit 0
 
 # Build single sketchybar command
 args=()
