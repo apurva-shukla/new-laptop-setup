@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
 # Restart sketchybar after waking from sleep
-sleep 2
-/opt/homebrew/bin/brew services restart sketchybar
+sleep "${WAKEUP_DELAY_SECONDS:-2}"
+
+if command -v brew >/dev/null 2>&1; then
+  brew services restart sketchybar >/dev/null 2>&1 || true
+fi

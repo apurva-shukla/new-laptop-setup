@@ -24,4 +24,10 @@ brew install switchaudio-osx
 
 ## Customization
 
-Edit the `INPUT_DEVICES` and `OUTPUT_DEVICES` arrays at the top of each script to set your priority order. The first available device in each list will be used.
+Edit profile arrays in `switch-audio-profile.sh` to set device priority order.
+
+- `webcam`
+- `grado`
+- `mobile`
+
+The first available device in each list is selected.

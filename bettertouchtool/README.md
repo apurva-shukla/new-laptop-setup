@@ -2,7 +2,7 @@
 
 ## Before Reset - Export Your Preset
 
-The license is saved here, but you need to export your preset manually:
+The preset is saved here, but you need to export it manually:
 
 1. Open BetterTouchTool
 2. Go to **Presets** (top left dropdown)
@@ -13,10 +13,13 @@ The license is saved here, but you need to export your preset manually:
 ## After Reset - Import
 
 1. Install BTT via `brew bundle`
-2. Open BTT and activate with the license file here
-3. Go to **Presets** → **Import Preset**
-4. Select your `.bttpreset` file
+2. Create a local license file from template:
+   - `cp bettertouchtool.bttlicense.example bettertouchtool.bttlicense`
+   - Fill in your real license values
+3. Open BTT and activate with the local license file
+4. Go to **Presets** → **Import Preset**
+5. Select your `.bttpreset` file
 
 ## License
 
-`bettertouchtool.bttlicense` - copy to `~/Library/Application Support/BetterTouchTool/`
+`bettertouchtool.bttlicense` (local, ignored by git) - copy to `~/Library/Application Support/BetterTouchTool/`

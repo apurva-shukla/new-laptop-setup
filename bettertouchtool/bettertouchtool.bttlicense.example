@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Product</key>
+	<string>BetterTouchTool</string>
+	<key>Name</key>
+	<string>YOUR_NAME</string>
+	<key>Email</key>
+	<string>you@example.com</string>
+	<key>OrderID</key>
+	<string>REPLACE_ME</string>
+	<key>LicenseType</key>
+	<string>REPLACE_ME</string>
+	<key>Licenses</key>
+	<string>1</string>
+	<key>Timestamp</key>
+	<string>0</string>
+	<key>CheckoutName</key>
+	<string>YOUR_NAME</string>
+	<key>TransactionID</key>
+	<string>REPLACE_ME</string>
+	<key>Signature</key>
+	<data>REPLACE_ME</data>
+</dict>
+</plist>

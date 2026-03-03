@@ -8,38 +8,36 @@
    ```
    This installs: pyenv, nvm, gcloud, sumble CLI, and work dependencies.
 
-2. **Clone this repo and run Brewfile**
+2. **Clone this repo**
    ```bash
    cd ~/code/personal/new-laptop-setup
-   brew bundle
    ```
 
-3. **Copy zshrc content to ~/.zshrc** (prepend before Sumble additions)
+3. **Run idempotent bootstrap**
    ```bash
-   cat zshrc ~/.zshrc > ~/.zshrc.tmp && mv ~/.zshrc.tmp ~/.zshrc
+   chmod +x ./bootstrap.sh
+   ./bootstrap.sh
+   ```
+   - Re-running this is safe.
+   - Use `./bootstrap.sh --skip-brew` to avoid package installs.
+   - Use `./bootstrap.sh --skip-services` to avoid starting services.
+
+4. **Add local secrets (one-time)**
+   ```bash
+   # bootstrap creates these files if missing
+   $EDITOR raycast/config.json
+   $EDITOR bettertouchtool/bettertouchtool.bttlicense
+   ```
+   Then fill in your real values locally. These files are ignored by git.
+
+5. **Apply macOS defaults (optional, review before running)**
+   ```bash
+   chmod +x ./macos-defaults.sh
+   ./macos-defaults.sh --allow-insecure
    ```
 
-4. **Set up symlinks for configs**
-   ```bash
-   ln -sf ~/code/personal/new-laptop-setup/ghostty ~/.config/ghostty
-   ln -sf ~/code/personal/new-laptop-setup/skhd ~/.config/skhd
-   ln -sf ~/code/personal/new-laptop-setup/yabai ~/.config/yabai
-   ln -sf ~/code/personal/new-laptop-setup/starship/starship.toml ~/.config/starship.toml
-   ln -sf ~/code/personal/new-laptop-setup/sketchybar ~/.config/sketchybar
-   ln -sf ~/code/personal/new-laptop-setup/tmux/tmux.conf ~/.tmux.conf
-   ln -sf ~/code/personal/new-laptop-setup/zed ~/.config/zed
-   ```
-
-5. **Copy git config**
-   ```bash
-   cp gitconfig ~/.gitconfig
-   ```
-
-6. **Start yabai and skhd**
-   ```bash
-   yabai --start-service
-   skhd --start-service
-   ```
+6. **Read secret rotation checklist if migrating from old repo state**
+   - `SECURITY-ROTATION.md`
 
 ## Manual Install Apps (not available via Homebrew)
 

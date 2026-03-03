@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SketchyBar Dependencies Installation Script
 # Run this once on a new machine after copying your sketchybar config
 
-set -e
+set -euo pipefail
 
 echo "🔧 Installing SketchyBar dependencies..."
 echo ""

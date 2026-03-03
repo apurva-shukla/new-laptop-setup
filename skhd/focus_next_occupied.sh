@@ -1,14 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Focus next space that has non-minimized, non-hidden windows
 # Wraps around to first occupied space if at end
 
-current=$(yabai -m query --spaces --space | jq '.index')
+if ! command -v yabai >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+    exit 0
+fi
+
+current="$(yabai -m query --spaces --space 2>/dev/null | jq -r '.index // empty' 2>/dev/null)" || exit 0
+[[ "$current" =~ ^[0-9]+$ ]] || exit 0
 
 # Get list of occupied spaces (spaces with visible windows)
-occupied=$(yabai -m query --windows | jq -r '
+occupied="$(yabai -m query --windows 2>/dev/null | jq -r '
   [.[] | select(."is-minimized" == false and ."is-hidden" == false) | .space] | unique | sort | .[]
-')
+' 2>/dev/null)" || exit 0
+
+[ -n "$occupied" ] || exit 0
 
 # Find next occupied space after current
 next=""

@@ -1,0 +1,11 @@
+.DS_Store
+**/.DS_Store
+
+# Local secrets (keep templates tracked)
+raycast/config.json
+bettertouchtool/bettertouchtool.bttlicense
+
+# Backups and editor swap files
+*.bak
+*.swp
+*.swo

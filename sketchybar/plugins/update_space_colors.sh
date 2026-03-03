@@ -1,7 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Query yabai for windows and update space icons and colors
 # Format: "1:AppName" for occupied, "1" for empty (yellow)
+
+if ! command -v yabai >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1 || ! command -v sketchybar >/dev/null 2>&1; then
+    exit 0
+fi
 
 get_short_name() {
     case "$1" in
@@ -39,7 +45,7 @@ space_apps=$(echo "$windows_json" | jq -r '
 args=()
 for i in $(seq 1 $SPACE_COUNT); do
     # Find app for this space
-    app=$(echo "$space_apps" | grep "^$i:" | cut -d: -f2 | head -1)
+    app=$(printf '%s\n' "$space_apps" | awk -F: -v idx="$i" '$1 == idx { print $2; exit }')
 
     if [ -n "$app" ]; then
         short_name=$(get_short_name "$app")
