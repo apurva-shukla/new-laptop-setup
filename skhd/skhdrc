@@ -14,8 +14,8 @@ alt - r : yabai -m space --rotate 90
 alt - m : yabai -m space --mirror y-axis
 
 # float / unfloat window and center on screen
-alt - t : yabai -m window --toggle float;\
-          yabai -m window --grid 4:4:1:1:2:2
+# alt - t : yabai -m window --toggle float;\
+#           yabai -m window --grid 4:4:1:1:2:2
 
 # swap window
 shift + alt - j : yabai -m window --swap west

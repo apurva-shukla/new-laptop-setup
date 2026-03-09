@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/opt/homebrew/opt/lua@5.4/bin/lua
 
 -- This is only needed once to install the sketchybar module
 -- (or for an update of the module)
