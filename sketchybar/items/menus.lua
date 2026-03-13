@@ -1,5 +1,6 @@
 local settings = require("settings")
 local colors = require("colors")
+local log = require("helpers.log").new("menus")
 
 -- Create a menu trigger item
 local menu_item = sbar.add("item", "menu_trigger", {
@@ -21,10 +22,6 @@ local menu_item = sbar.add("item", "menu_trigger", {
         drawing = true,
     },
 })
-
-menu_item:subscribe("mouse.clicked", function(env)
-    sbar.trigger("swap_menus_and_spaces")
-end)
 
 -- Maximum number of menu items to display
 local max_items = 15
@@ -56,113 +53,93 @@ local menu_watcher = sbar.add("item", {
 
 -- Menu state variable
 local menu_visible = false
+local menu_labels = {}
+local update_running = false
+local update_pending = false
+local pending_reason = "unknown"
+
+local function apply_menu_state()
+    for i = 1, max_items do
+        local label = menu_labels[i]
+        if label and label ~= "" then
+            menu_items[i]:set({
+                drawing = menu_visible,
+                width = menu_visible and "dynamic" or 0,
+                label = {
+                    string = label,
+                    drawing = menu_visible,
+                },
+            })
+        else
+            menu_items[i]:set({
+                drawing = false,
+                width = 0,
+                label = {
+                    string = "",
+                    drawing = false,
+                },
+            })
+        end
+    end
+end
 
 -- Function to update menu contents
-local function update_menus()
+local function update_menus(reason)
+    if not menu_visible and reason ~= "toggle" then
+        return
+    end
+
+    if update_running then
+        update_pending = true
+        pending_reason = reason
+        return
+    end
+
+    update_running = true
+    local started = os.clock()
+
     sbar.exec("$CONFIG_DIR/helpers/menus/bin/menus -l", function(menus)
-        -- Reset all menu items
-        for i = 1, max_items do
-            menu_items[i]:set({ drawing = false, width = 0 })
+        update_running = false
+
+        local labels = {}
+        local id = 1
+        if menus then
+            for menu in string.gmatch(menus, '[^\r\n]+') do
+                if id > max_items then
+                    break
+                end
+                labels[id] = menu
+                id = id + 1
+            end
         end
 
-        -- Update with new menu items
-        local id = 1
-        for menu in string.gmatch(menus, '[^\r\n]+') do
-            if id <= max_items then
-                menu_items[id]:set({
-                    label = {
-                        string = menu,
-                    },
-                    drawing = menu_visible,
-                    width = menu_visible and "dynamic" or 0
-                })
-            else
-                break
-            end
-            id = id + 1
+        menu_labels = labels
+        apply_menu_state()
+
+        local elapsed_ms = (os.clock() - started) * 1000
+        if elapsed_ms > 200 then
+            log.warn("menu refresh (%s) took %.2fms with %d items", reason, elapsed_ms, #labels)
+        end
+
+        if update_pending and menu_visible then
+            local next_reason = pending_reason
+            update_pending = false
+            pending_reason = "unknown"
+            update_menus(next_reason)
         end
     end)
 end
 
 -- Function to toggle the menu
 local function toggle_menu()
-    -- Toggle the menu state
     menu_visible = not menu_visible
+    menu_watcher:set({ updates = menu_visible })
 
     if menu_visible then
-        -- Show menu items with animation
-        menu_watcher:set({ updates = true })
-
-        -- Prepare menu items but keep them hidden until animation starts
-        update_menus()
-
-        -- Initialize items with drawing=false and width=0
-        for i = 1, max_items do
-            local query = menu_items[i]:query()
-            local has_content = query.label.string ~= ""
-
-            if has_content then
-                -- Make sure items aren't visible at 0 width
-                menu_items[i]:set({
-                    drawing = false,
-                    width = 0,
-                    label = {
-                        drawing = false
-                    }
-                })
-            end
-        end
-
-        -- First make them drawing=true but with label still hidden
-        for i = 1, max_items do
-            local query = menu_items[i]:query()
-            local has_content = query.label.string ~= ""
-
-            if has_content then
-                menu_items[i]:set({ drawing = true })
-            end
-        end
-
-        -- Animate the expansion
-        sbar.animate("tanh", 30.0, function()
-            for i = 1, max_items do
-                local query = menu_items[i]:query()
-                local is_drawing = query.geometry.drawing == "on"
-
-                if is_drawing then
-                    -- First set the width
-                    menu_items[i]:set({ width = "dynamic" })
-                    -- Then make label visible
-                    menu_items[i]:set({
-                        label = {
-                            drawing = true
-                        }
-                    })
-                end
-            end
-        end)
+        apply_menu_state()
+        update_menus("toggle")
     else
-        update_menus()
-        -- Hide menu items with animation
-        sbar.animate("tanh", 30.0, function()
-            for i = 1, max_items do
-                menu_items[i]:set({ width = 0, drawing = true })
-            end
-            for i = 1, max_items do
-                menu_items[i]:set({ width = 0, drawing = false })
-            end
-            menu_watcher:set({ updates = false })
-        end)
-        -- sbar.animate("tanh", 30, function()
-        --     for i = 1, max_items do
-        --         menu_items[i]:set({ width = 0 })
-        --     end
-        -- end, function()
-        --     for i = 1, max_items do
-        --         menu_items[i]:set({ drawing = false })
-        --     end
-        --     menu_watcher:set({ updates = false })
-        -- end)
+        apply_menu_state()
     end
 end
 
@@ -172,11 +149,8 @@ menu_item:subscribe("mouse.clicked", function(env)
 end)
 
 -- Subscribe to front app changes
-menu_watcher:subscribe("front_app_switched", function(env)
-    update_menus()
+menu_watcher:subscribe("front_app_switched", function()
+    update_menus("front_app_switched")
 end)
-
--- Initial update
-update_menus()
 
 return menu_watcher

@@ -5,7 +5,6 @@ local settings = require("settings")
 -- Shows: B (BSP), F (Float), S (Stack)
 local mode_indicator = sbar.add("item", "yabai.mode", {
     position = "left",
-    update_freq = 2,
     icon = {
         string = "?",
         color = colors.grey,
@@ -24,12 +23,37 @@ local mode_indicator = sbar.add("item", "yabai.mode", {
     },
 })
 
+local update_running = false
+local update_pending = false
+local LAYOUT_QUERY = "yabai -m query --spaces --space 2>/dev/null | jq -r '.type // empty' 2>/dev/null"
+
 local function update_mode()
-    -- Use grep to extract layout type directly
-    sbar.exec("yabai -m query --spaces --space | grep -o '\"type\":\"[^\"]*\"' | cut -d'\"' -f4", function(layout)
-        if not layout then return end
+    if update_running then
+        update_pending = true
+        return
+    end
+
+    update_running = true
+    sbar.exec(LAYOUT_QUERY, function(layout)
+        update_running = false
+
+        if not layout then
+            if update_pending then
+                update_pending = false
+                update_mode()
+            end
+            return
+        end
 
         layout = tostring(layout):gsub("%s+", "")  -- Remove whitespace/newlines
+
+        if layout == "" then
+            if update_pending then
+                update_pending = false
+                update_mode()
+            end
+            return
+        end
 
         local icon_str = "B"
         local icon_color = colors.green
@@ -51,11 +75,15 @@ local function update_mode()
                 color = icon_color
             }
         })
+
+        if update_pending then
+            update_pending = false
+            update_mode()
+        end
     end)
 end
 
--- Update on routine timer and events
-mode_indicator:subscribe({"routine", "forced", "space_change", "front_app_switched", "system_woke"}, function()
+mode_indicator:subscribe({"forced", "space_change", "system_woke"}, function()
     update_mode()
 end)
 
@@ -63,10 +91,10 @@ end)
 mode_indicator:subscribe("mouse.clicked", function(env)
     if env.BUTTON == "left" then
         -- Toggle between bsp and float
-        sbar.exec("yabai -m query --spaces --space | grep -q '\"type\":\"bsp\"' && yabai -m space --layout float || yabai -m space --layout bsp")
+        sbar.exec("yabai -m query --spaces --space 2>/dev/null | jq -r '.type // empty' 2>/dev/null | grep -q '^bsp$' && yabai -m space --layout float || yabai -m space --layout bsp")
     else
         -- Right click: cycle bsp -> stack -> float -> bsp
-        sbar.exec("yabai -m query --spaces --space | grep -o '\"type\":\"[^\"]*\"' | cut -d'\"' -f4", function(layout)
+        sbar.exec(LAYOUT_QUERY, function(layout)
             layout = tostring(layout):gsub("%s+", "")
             local next_layout = "bsp"
             if layout == "bsp" then
@@ -82,3 +110,5 @@ mode_indicator:subscribe("mouse.clicked", function(env)
         update_mode()
     end)
 end)
+
+update_mode()

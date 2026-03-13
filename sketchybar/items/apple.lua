@@ -20,7 +20,3 @@ local apple = sbar.add("item", "apple", {
     },
     click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s 0",
 })
-
-apple:subscribe({"mouse.clicked", "front_app_switched"}, function(env)
-    -- Event handler for mouse clicks and app switches
-end)

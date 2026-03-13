@@ -3,6 +3,7 @@
 # Load scripting addition (requires SIP partially disabled)
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 sudo yabai --load-sa
+SKETCHYBAR_BIN="$(command -v sketchybar || true)"
 
 # Reserve space for SketchyBar (height + margin + padding)
 yabai -m config external_bar all:45:0
@@ -41,8 +42,11 @@ yabai -m signal --add event=window_focused action="yabai -m window \$YABAI_WINDO
 yabai -m signal --add event=window_unfocused action="yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
 
 # Rebalance the tree when windows change
-yabai -m signal --add event=window_created  action="yabai -m space --balance"
-yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
+yabai -m signal --add event=window_created  action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_destroyed action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_moved action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_minimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_deminimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
 
 # Send apps to specific spaces and focus that space
 # Space 1 - Chrome

@@ -1,5 +1,6 @@
 local colors = require("colors")
 local settings = require("settings")
+local log = require("helpers.log").new("spaces")
 
 -- Number of spaces to display (max spaces shown in bar)
 local SPACE_COUNT = 10
@@ -10,11 +11,33 @@ local spaces = {}
 -- Path to update script (handles both icon text and colors)
 local CONFIG_DIR = os.getenv("HOME") .. "/.config/sketchybar"
 local UPDATE_SCRIPT = CONFIG_DIR .. "/plugins/update_space_colors.sh"
+local update_running = false
+local update_pending = false
+local pending_reason = "unknown"
 
 -- Update space icons and colors via shell script
--- (Lua set() is unreliable for icon/color changes)
-local function update_space_icons()
-    sbar.exec(UPDATE_SCRIPT)
+local function update_space_icons(reason)
+    if update_running then
+        update_pending = true
+        pending_reason = reason or "unknown"
+        return
+    end
+
+    update_running = true
+    local started = os.clock()
+    sbar.exec(UPDATE_SCRIPT, function()
+        update_running = false
+        local elapsed_ms = (os.clock() - started) * 1000
+        if elapsed_ms > 200 then
+            log.warn("space refresh (%s) took %.2fms", reason or "unknown", elapsed_ms)
+        end
+        if update_pending then
+            local next_reason = pending_reason
+            update_pending = false
+            pending_reason = "unknown"
+            update_space_icons(next_reason)
+        end
+    end)
 end
 
 -- Mouse click handler
@@ -90,18 +113,14 @@ local space_watcher = sbar.add("item", "space.watcher", {
 })
 
 space_watcher:subscribe("space_change", function()
-    update_space_icons()
-end)
-
-space_watcher:subscribe("front_app_switched", function()
-    update_space_icons()
+    update_space_icons("space_change")
 end)
 
 -- Custom event for window changes (requires yabai signals)
 sbar.add("event", "windows_changed")
 space_watcher:subscribe("windows_changed", function()
-    update_space_icons()
+    update_space_icons("windows_changed")
 end)
 
 -- Initial update
-update_space_icons()
+update_space_icons("initial")
