@@ -38,12 +38,16 @@ yabai -m rule --add title="[Bb]itwarden" manage=off
 yabai -m config window_placement second_child
 
 # Keep focused window on top (raise on focus, lower on unfocus)
-yabai -m signal --add event=window_focused action="yabai -m window \$YABAI_WINDOW_ID --sub-layer above"
-yabai -m signal --add event=window_unfocused action="yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
+# Exclude Finder from per-window signals — its transient dialogs cause signal cascades
+yabai -m signal --add event=window_focused app!="^Finder$" action="yabai -m window \$YABAI_WINDOW_ID --sub-layer above"
+yabai -m signal --add event=window_unfocused app!="^Finder$" action="yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
+# Raise/lower Finder on app switch instead (fires once, no cascade from child dialogs)
+yabai -m signal --add event=application_front_switched app="^Finder$" action="yabai -m query --windows --app Finder | jq -r '.[].id' | while read wid; do yabai -m window \$wid --sub-layer above; done"
+yabai -m signal --add event=application_deactivated app="^Finder$" action="yabai -m query --windows --app Finder | jq -r '.[].id' | while read wid; do yabai -m window \$wid --sub-layer normal; done"
 
 # Rebalance the tree when windows change
-yabai -m signal --add event=window_created  action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
-yabai -m signal --add event=window_destroyed action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_created app!="^Finder$" action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+yabai -m signal --add event=window_destroyed app!="^Finder$" action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
 yabai -m signal --add event=window_moved action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
 yabai -m signal --add event=window_minimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
 yabai -m signal --add event=window_deminimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
