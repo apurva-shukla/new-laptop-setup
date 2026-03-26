@@ -51,5 +51,16 @@ return {
                 padding_right = 8,
             }
         }
-    }
+    },
+
+    granola = {
+        enabled = true,
+        owner = "Granola",
+        -- Override this if Granola exposes a different alias on your machine.
+        alias_candidates = {
+            "Granola",
+        },
+        scale = 1.0,
+        update_freq = 5,
+    },
 }

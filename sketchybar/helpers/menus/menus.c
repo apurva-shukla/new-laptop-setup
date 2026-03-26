@@ -92,6 +92,48 @@ void ax_print_menu_options(AXUIElementRef app) {
   }
 }
 
+void ax_print_extra_menu_items(char* owner_filter) {
+  CFArrayRef window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll,
+                                                      kCGNullWindowID        );
+  if (!window_list) return;
+
+  char owner_buffer[256];
+  char name_buffer[256];
+  char alias_buffer[512];
+  int window_count = CFArrayGetCount(window_list);
+
+  for (int i = 0; i < window_count; ++i) {
+    CFDictionaryRef dictionary = CFArrayGetValueAtIndex(window_list, i);
+    if (!dictionary) continue;
+
+    CFStringRef owner_ref = CFDictionaryGetValue(dictionary, kCGWindowOwnerName);
+    CFStringRef name_ref = CFDictionaryGetValue(dictionary, kCGWindowName);
+    CFNumberRef layer_ref = CFDictionaryGetValue(dictionary, kCGWindowLayer);
+
+    if (!owner_ref || !name_ref || !layer_ref) continue;
+
+    long long int layer = 0;
+    CFNumberGetValue(layer_ref, CFNumberGetType(layer_ref), &layer);
+    if (layer != 0x19) continue;
+
+    CFStringGetCString(owner_ref,
+                       owner_buffer,
+                       sizeof(owner_buffer),
+                       kCFStringEncodingUTF8);
+    CFStringGetCString(name_ref,
+                       name_buffer,
+                       sizeof(name_buffer),
+                       kCFStringEncodingUTF8);
+
+    if (owner_filter && strcmp(owner_buffer, owner_filter) != 0) continue;
+
+    snprintf(alias_buffer, sizeof(alias_buffer), "%s,%s", owner_buffer, name_buffer);
+    printf("%s\n", alias_buffer);
+  }
+
+  CFRelease(window_list);
+}
+
 AXUIElementRef ax_get_extra_menu_item(char* alias) {
   pid_t pid = 0;
   CGRect bounds = CGRectNull;
@@ -226,7 +268,7 @@ AXUIElementRef ax_get_front_app() {
 
 int main (int argc, char **argv) {
   if (argc == 1) {
-    printf("Usage: %s [-l | -s id/alias ]\n", argv[0]);
+    printf("Usage: %s [-l | -a owner | -s id/alias ]\n", argv[0]);
     exit(0);
   }
   ax_init();
@@ -235,6 +277,8 @@ int main (int argc, char **argv) {
     if (!app) return 1;
     ax_print_menu_options(app);
     CFRelease(app);
+  } else if (argc == 3 && strcmp(argv[1], "-a") == 0) {
+    ax_print_extra_menu_items(argv[2]);
   } else if (argc == 3 && strcmp(argv[1], "-s") == 0) {
     int id = 0;
     if (sscanf(argv[2], "%d", &id) == 1) {

@@ -1,3 +1,4 @@
+require("items.widgets.granola")
 require("items.widgets.meeting")
 require("items.widgets.brew")
 require("items.widgets.volume")

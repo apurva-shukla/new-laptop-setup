@@ -1,12 +1,48 @@
 #!/bin/sh
 
-# Load scripting addition (requires SIP partially disabled)
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-sudo yabai --load-sa
-SKETCHYBAR_BIN="$(command -v sketchybar || true)"
+JQ_BIN="$(command -v jq || true)"
 
-# Reserve space for SketchyBar (height + margin + padding)
-yabai -m config external_bar all:45:0
+reset_signals() {
+  [ -n "$JQ_BIN" ] || return 0
+
+  yabai -m signal --list 2>/dev/null \
+    | "$JQ_BIN" -r 'sort_by(.index) | reverse | .[].index' \
+    | while IFS= read -r signal_index; do
+        [ -n "$signal_index" ] || continue
+        yabai -m signal --remove "$signal_index" 2>/dev/null || true
+      done
+}
+
+reset_rules() {
+  [ -n "$JQ_BIN" ] || return 0
+
+  yabai -m rule --list 2>/dev/null \
+    | "$JQ_BIN" -r 'sort_by(.index) | reverse | .[].index' \
+    | while IFS= read -r rule_index; do
+        [ -n "$rule_index" ] || continue
+        yabai -m rule --remove "$rule_index" 2>/dev/null || true
+      done
+}
+
+add_signal() {
+  label="$1"
+  event="$2"
+  action="$3"
+  shift 3
+
+  yabai -m signal --remove "$label" 2>/dev/null || true
+  yabai -m signal --add event="$event" action="$action" label="$label" "$@"
+}
+
+# Load scripting addition (requires SIP partially disabled)
+reset_signals
+reset_rules
+add_signal dock_did_restart dock_did_restart "sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# SketchyBar is disabled, so yabai should not reserve bar space or notify it.
+SKETCHYBAR_BIN=""
+yabai -m config external_bar all:0:0
 
 # Use BSP tiling layout
 yabai -m config layout bsp
@@ -21,7 +57,7 @@ yabai -m space 6 --label messaging
 
 # Disable apps from being managed by yabai (floating)
 yabai -m rule --add app="^System Settings$" manage=off
-yabai -m rule --add app="^Finder$" manage=off
+# yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Reminders$" manage=off
 yabai -m rule --add app="^Raycast$" title!="^AI Chat$" manage=off
 yabai -m rule --add app="^Loom$" manage=off
@@ -37,44 +73,37 @@ yabai -m rule --add title="[Bb]itwarden" manage=off
 
 yabai -m config window_placement second_child
 
-# Keep focused window on top (raise on focus, lower on unfocus)
-# Exclude Finder from per-window signals — its transient dialogs cause signal cascades
-yabai -m signal --add event=window_focused app!="^Finder$" action="yabai -m window \$YABAI_WINDOW_ID --sub-layer above"
-yabai -m signal --add event=window_unfocused app!="^Finder$" action="yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
-# Raise/lower Finder on app switch instead (fires once, no cascade from child dialogs)
-yabai -m signal --add event=application_front_switched app="^Finder$" action="yabai -m query --windows --app Finder | jq -r '.[].id' | while read wid; do yabai -m window \$wid --sub-layer above; done"
-yabai -m signal --add event=application_deactivated app="^Finder$" action="yabai -m query --windows --app Finder | jq -r '.[].id' | while read wid; do yabai -m window \$wid --sub-layer normal; done"
-
 # Rebalance the tree when windows change
-yabai -m signal --add event=window_created app!="^Finder$" action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
-yabai -m signal --add event=window_destroyed app!="^Finder$" action="yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
-yabai -m signal --add event=window_moved action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
-yabai -m signal --add event=window_minimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
-yabai -m signal --add event=window_deminimized action="[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+add_signal rebalance_on_create window_created "yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+add_signal rebalance_on_destroy window_destroyed "yabai -m space --balance; [ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+add_signal sketchybar_on_move window_moved "[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+add_signal sketchybar_on_minimize window_minimized "[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
+add_signal sketchybar_on_deminimize window_deminimized "[ -n \"$SKETCHYBAR_BIN\" ] && \"$SKETCHYBAR_BIN\" --trigger windows_changed"
 
 # Send apps to specific spaces and focus that space
 # Space 1 - Chrome
-yabai -m rule --add app="^Google Chrome$" space=1
-yabai -m signal --add event=window_created app="^Google Chrome$" action="yabai -m space --focus 1"
+yabai -m rule --add app="^Google Chrome$" space=chrome
+add_signal focus_space_chrome window_created "yabai -m space --focus chrome" app="^Google Chrome$"
 
 # Space 2 - Slack
-yabai -m rule --add app="^Slack$" space=2
-yabai -m signal --add event=window_created app="^Slack$" action="yabai -m space --focus 2"
+yabai -m rule --add app="^Slack$" space=slack
+add_signal focus_space_slack window_created "yabai -m space --focus slack" app="^Slack$"
 
 # Space 3 & 4 - Flex (no rules, open anything here)
 
 # Space 5 - Zen
-yabai -m rule --add app="^(Zen|Zen Browser)$" space=5
-yabai -m signal --add event=window_created app="^(Zen|Zen Browser)$" action="yabai -m space --focus 5"
+yabai -m rule --add app="^(Zen|Zen Browser)$" space=zen
+add_signal focus_space_zen window_created "yabai -m space --focus zen" app="^(Zen|Zen Browser)$"
 
 # Space 6 - Messaging
-yabai -m rule --add app="WhatsApp$" space=6
-yabai -m rule --add app="^Messages$" space=6
-yabai -m signal --add event=window_created app="WhatsApp$" action="yabai -m space --focus 6"
-yabai -m signal --add event=window_created app="^Messages$" action="yabai -m space --focus 6"
- 
+yabai -m rule --add app="WhatsApp$" space=messaging
+yabai -m rule --add app="^Messages$" space=messaging
+add_signal focus_space_whatsapp window_created "yabai -m space --focus messaging" app="WhatsApp$"
+add_signal focus_space_messages window_created "yabai -m space --focus messaging" app="^Messages$"
+
 # Padding and gaps
-yabai -m config top_padding    0
+# Keep tiled windows below the native macOS menu bar.
+yabai -m config top_padding    30
 yabai -m config bottom_padding 4
 yabai -m config left_padding   4
 yabai -m config right_padding  4
@@ -84,6 +113,7 @@ yabai -m config window_gap     4
 yabai -m config mouse_modifier fn
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
+
 
 pkill -x borders 2>/dev/null || true
 borders active_color=0xff00ff00 inactive_color=0x00000000 width=6.0 style=round &
