@@ -7,9 +7,19 @@
 
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/bin/open</string>
-    <string>/Users/apurvashukla/code/personal/new-laptop-setup/current-space-menubar/build/CurrentSpaceMenu.app</string>
+    <string>/Users/apurvashukla/code/personal/new-laptop-setup/current-space-menubar/build/CurrentSpaceMenu.app/Contents/MacOS/CurrentSpaceMenu</string>
   </array>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>LimitLoadToSessionType</key>
+  <array>
+    <string>Aqua</string>
+  </array>
+
+  <key>ProcessType</key>
+  <string>Interactive</string>
 
   <key>RunAtLoad</key>
   <true/>
