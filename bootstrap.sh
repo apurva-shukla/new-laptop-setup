@@ -84,9 +84,8 @@ mkdir -p "$HOME/Library/LaunchAgents"
 link_item "$REPO_DIR/ghostty" "$CONFIG_HOME/ghostty"
 link_item "$REPO_DIR/skhd" "$CONFIG_HOME/skhd"
 link_item "$REPO_DIR/yabai" "$CONFIG_HOME/yabai"
-link_item "$REPO_DIR/sketchybar" "$CONFIG_HOME/sketchybar"
 link_item "$REPO_DIR/zed" "$CONFIG_HOME/zed"
-link_item "$REPO_DIR/launchagents/com.apurvashukla.sketchybar-watchdog.plist" "$HOME/Library/LaunchAgents/com.apurvashukla.sketchybar-watchdog.plist"
+link_item "$REPO_DIR/launchagents/com.apurvashukla.current-space-menu.plist" "$HOME/Library/LaunchAgents/com.apurvashukla.current-space-menu.plist"
 link_item "$REPO_DIR/starship/starship.toml" "$CONFIG_HOME/starship.toml"
 link_item "$REPO_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
@@ -119,11 +118,8 @@ if [ "$SKIP_SERVICES" = false ]; then
   if command -v skhd >/dev/null 2>&1; then
     skhd --start-service || true
   fi
-  if command -v brew >/dev/null 2>&1; then
-    brew services start sketchybar >/dev/null 2>&1 || true
-  fi
-  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.apurvashukla.sketchybar-watchdog.plist" >/dev/null 2>&1 || true
-  launchctl kickstart -k "gui/$(id -u)/com.apurvashukla.sketchybar-watchdog" >/dev/null 2>&1 || true
+  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.apurvashukla.current-space-menu.plist" >/dev/null 2>&1 || true
+  launchctl kickstart -k "gui/$(id -u)/com.apurvashukla.current-space-menu" >/dev/null 2>&1 || true
 fi
 
 echo "Done."

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.apurvashukla.current-space-menu</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/open</string>
+    <string>/Users/apurvashukla/code/personal/new-laptop-setup/current-space-menubar/build/CurrentSpaceMenu.app</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/current-space-menu.launchagent.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/current-space-menu.launchagent.log</string>
+</dict>
+</plist>
