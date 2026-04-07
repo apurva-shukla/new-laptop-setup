@@ -1,70 +1,81 @@
+# Notification helper — all bindings use this for visual feedback
+# Usage: notify.sh "Title" "Body" cmd [args...]
+
 # moves focus between windows in the current focused display
-alt - j : yabai -m window --focus west
-alt - k : yabai -m window --focus south
-alt - i : yabai -m window --focus north
-alt - l : yabai -m window --focus east
+alt - j : ~/.config/skhd/notify.sh "Focus" "← West"  yabai -m window --focus west
+alt - k : ~/.config/skhd/notify.sh "Focus" "↓ South" yabai -m window --focus south
+alt - i : ~/.config/skhd/notify.sh "Focus" "↑ North" yabai -m window --focus north
+alt - l : ~/.config/skhd/notify.sh "Focus" "→ East"  yabai -m window --focus east
 
 # toggle window split type
-alt - s : yabai -m window --toggle split
+alt - s : ~/.config/skhd/notify.sh "Split" "Toggled split" yabai -m window --toggle split
+
+# toggle skip-empty-spaces mode (ctrl+left/right behavior)
+alt - y : if [ -f /tmp/skhd_skip_empty_spaces ]; then \
+            rm -f /tmp/skhd_skip_empty_spaces; \
+            osascript -e 'display notification "Visiting ALL spaces" with title "Space Skip: OFF"'; \
+          else \
+            touch /tmp/skhd_skip_empty_spaces; \
+            osascript -e 'display notification "Skipping empty spaces" with title "Space Skip: ON"'; \
+          fi
 
 # rotate tree
-alt - r : yabai -m space --rotate 90
+alt - r : ~/.config/skhd/notify.sh "Layout" "Rotated 90°" yabai -m space --rotate 90
 
 # mirror tree y-axis
-alt - m : yabai -m space --mirror y-axis
+alt - m : ~/.config/skhd/notify.sh "Layout" "Mirrored Y-axis" yabai -m space --mirror y-axis
 
 # float / unfloat window and center on screen
 # alt - t : yabai -m window --toggle float;\
 #           yabai -m window --grid 4:4:1:1:2:2
 
 # swap window
-shift + alt - j : yabai -m window --swap west
-shift + alt - k : yabai -m window --swap south
-shift + alt - i : yabai -m window --swap north
-shift + alt - l : yabai -m window --swap east
+shift + alt - j : ~/.config/skhd/notify.sh "Swap" "← West"  yabai -m window --swap west
+shift + alt - k : ~/.config/skhd/notify.sh "Swap" "↓ South" yabai -m window --swap south
+shift + alt - i : ~/.config/skhd/notify.sh "Swap" "↑ North" yabai -m window --swap north
+shift + alt - l : ~/.config/skhd/notify.sh "Swap" "→ East"  yabai -m window --swap east
 
 # move window
-shift + cmd - j : yabai -m window --warp west
-shift + cmd - k : yabai -m window --warp south
-shift + cmd - i : yabai -m window --warp north
-shift + cmd - l : yabai -m window --warp east
+shift + cmd - j : ~/.config/skhd/notify.sh "Warp" "← West"  yabai -m window --warp west
+shift + cmd - k : ~/.config/skhd/notify.sh "Warp" "↓ South" yabai -m window --warp south
+shift + cmd - i : ~/.config/skhd/notify.sh "Warp" "↑ North" yabai -m window --warp north
+shift + cmd - l : ~/.config/skhd/notify.sh "Warp" "→ East"  yabai -m window --warp east
 
 # change layout of desktop
-alt - b : yabai -m space --layout bsp
-alt - f : yabai -m space --layout float
+alt - b : ~/.config/skhd/notify.sh "Layout" "BSP tiling" yabai -m space --layout bsp
+alt - f : ~/.config/skhd/notify.sh "Layout" "Floating" yabai -m space --layout float
 
 # increase window size
-ctrl + alt - j : yabai -m window --resize left:-40:0    
-ctrl + alt - k : yabai -m window --resize bottom:0:40
-ctrl + alt - i : yabai -m window --resize top:0:-40
-ctrl + alt - l : yabai -m window --resize right:40:0
+ctrl + alt - j : ~/.config/skhd/notify.sh "Resize" "← Grow left"   yabai -m window --resize left:-40:0
+ctrl + alt - k : ~/.config/skhd/notify.sh "Resize" "↓ Grow down"   yabai -m window --resize bottom:0:40
+ctrl + alt - i : ~/.config/skhd/notify.sh "Resize" "↑ Grow up"     yabai -m window --resize top:0:-40
+ctrl + alt - l : ~/.config/skhd/notify.sh "Resize" "→ Grow right"  yabai -m window --resize right:40:0
 
 # decrease window size
-ctrl + alt + cmd - l : yabai -m window --resize left:40:0
-ctrl + alt + cmd - i : yabai -m window --resize bottom:0:-40
-ctrl + alt + cmd - k : yabai -m window --resize top:0:40
-ctrl + alt + cmd - j : yabai -m window --resize right:-40:0
+ctrl + alt + cmd - l : ~/.config/skhd/notify.sh "Resize" "← Shrink right" yabai -m window --resize left:40:0
+ctrl + alt + cmd - i : ~/.config/skhd/notify.sh "Resize" "↑ Shrink down"  yabai -m window --resize bottom:0:-40
+ctrl + alt + cmd - k : ~/.config/skhd/notify.sh "Resize" "↓ Shrink up"    yabai -m window --resize top:0:40
+ctrl + alt + cmd - j : ~/.config/skhd/notify.sh "Resize" "→ Shrink left"  yabai -m window --resize right:-40:0
 
 # restart yabai
-ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+ctrl + alt + cmd - r : ~/.config/skhd/notify.sh "yabai" "Restarting…" launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
 
 # switch to space (Cmd + number)
-cmd - 1 : yabai -m space --focus 1
-cmd - 2 : yabai -m space --focus 2
-cmd - 3 : yabai -m space --focus 3
-cmd - 4 : yabai -m space --focus 4
-cmd - 5 : yabai -m space --focus 5
-cmd - 6 : yabai -m space --focus 6
+cmd - 1 : ~/.config/skhd/notify.sh "Space 1" "Chrome"    yabai -m space --focus 1
+cmd - 2 : ~/.config/skhd/notify.sh "Space 2" "Slack"     yabai -m space --focus 2
+cmd - 3 : ~/.config/skhd/notify.sh "Space 3" "Flex 1"    yabai -m space --focus 3
+cmd - 4 : ~/.config/skhd/notify.sh "Space 4" "Flex 2"    yabai -m space --focus 4
+cmd - 5 : ~/.config/skhd/notify.sh "Space 5" "Zen"       yabai -m space --focus 5
+cmd - 6 : ~/.config/skhd/notify.sh "Space 6" "Messaging" yabai -m space --focus 6
 
 # switch to prev/next occupied space (Ctrl + arrows) - skips empty spaces
 ctrl - left : ~/.config/skhd/focus_prev_occupied.sh
 ctrl - right : ~/.config/skhd/focus_next_occupied.sh
 
 # move window to space (Shift + Cmd + number)
-shift + cmd - 1 : yabai -m window --space 1; yabai -m space --focus 1
-shift + cmd - 2 : yabai -m window --space 2; yabai -m space --focus 2
-shift + cmd - 3 : yabai -m window --space 3; yabai -m space --focus 3
-shift + cmd - 4 : yabai -m window --space 4; yabai -m space --focus 4
-shift + cmd - 5 : yabai -m window --space 5; yabai -m space --focus 5
-shift + cmd - 6 : yabai -m window --space 6; yabai -m space --focus 6
-
+shift + cmd - 1 : ~/.config/skhd/notify.sh "Move → Space 1" "Chrome"    bash -c 'yabai -m window --space 1; yabai -m space --focus 1'
+shift + cmd - 2 : ~/.config/skhd/notify.sh "Move → Space 2" "Slack"     bash -c 'yabai -m window --space 2; yabai -m space --focus 2'
+shift + cmd - 3 : ~/.config/skhd/notify.sh "Move → Space 3" "Flex 1"    bash -c 'yabai -m window --space 3; yabai -m space --focus 3'
+shift + cmd - 4 : ~/.config/skhd/notify.sh "Move → Space 4" "Flex 2"    bash -c 'yabai -m window --space 4; yabai -m space --focus 4'
+shift + cmd - 5 : ~/.config/skhd/notify.sh "Move → Space 5" "Zen"       bash -c 'yabai -m window --space 5; yabai -m space --focus 5'
+shift + cmd - 6 : ~/.config/skhd/notify.sh "Move → Space 6" "Messaging" bash -c 'yabai -m window --space 6; yabai -m space --focus 6'

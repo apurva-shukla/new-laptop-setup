@@ -50,3 +50,4 @@ keybind = cmd+delete=text:\x0b
 # This one makes Option+Backspace delete the word to the left
 keybind = alt+backspace=text:\x17
 keybind = shift+enter=text:\x1b\r
+

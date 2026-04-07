@@ -102,8 +102,8 @@ add_signal focus_space_whatsapp window_created "yabai -m space --focus messaging
 add_signal focus_space_messages window_created "yabai -m space --focus messaging" app="^Messages$"
 
 # Padding and gaps
-# Keep tiled windows below the native macOS menu bar.
-yabai -m config top_padding    30
+# Let tiled windows sit directly below the native macOS menu bar.
+yabai -m config top_padding    0
 yabai -m config bottom_padding 4
 yabai -m config left_padding   4
 yabai -m config right_padding  4

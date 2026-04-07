@@ -2,12 +2,23 @@
 
 set -euo pipefail
 
-# Focus previous space that has non-minimized, non-hidden windows
-# Wraps around to last occupied space if at beginning
+# Focus previous space. If skip-empty mode is on, only visit occupied spaces.
+# Wraps around at the beginning.
 
-if ! command -v yabai >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+if ! command -v yabai >/dev/null 2>&1; then
     exit 0
 fi
+
+SKIP_FILE="/tmp/skhd_skip_empty_spaces"
+
+# If skip mode is off, just go to prev space directly
+if [ ! -f "$SKIP_FILE" ]; then
+    yabai -m space --focus prev 2>/dev/null || yabai -m space --focus last 2>/dev/null
+    exit 0
+fi
+
+# Skip-empty mode: find previous occupied space
+command -v jq >/dev/null 2>&1 || exit 0
 
 current="$(yabai -m query --spaces --space 2>/dev/null | jq -r '.index // empty' 2>/dev/null)" || exit 0
 [[ "$current" =~ ^[0-9]+$ ]] || exit 0
