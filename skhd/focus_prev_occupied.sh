@@ -10,10 +10,13 @@ if ! command -v yabai >/dev/null 2>&1; then
 fi
 
 SKIP_FILE="/tmp/skhd_skip_empty_spaces"
+SKHD_LOG="${SKHD_LOG:-$HOME/.local/share/skhd/usage.log}"
+_log() { mkdir -p "$(dirname "$SKHD_LOG")"; printf '%s\t%s\t%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" "$2" >> "$SKHD_LOG"; }
 
 # If skip mode is off, just go to prev space directly
 if [ ! -f "$SKIP_FILE" ]; then
     yabai -m space --focus prev 2>/dev/null || yabai -m space --focus last 2>/dev/null
+    _log "Nav" "← Prev space"
     exit 0
 fi
 
@@ -52,4 +55,5 @@ fi
 # Focus the space if found
 if [ -n "$prev" ]; then
     yabai -m space --focus "$prev"
+    _log "Nav" "← Prev occupied (space $prev)"
 fi

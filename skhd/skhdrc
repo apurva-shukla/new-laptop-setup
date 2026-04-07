@@ -11,11 +11,14 @@ alt - l : ~/.config/skhd/notify.sh "Focus" "→ East"  yabai -m window --focus e
 alt - s : ~/.config/skhd/notify.sh "Split" "Toggled split" yabai -m window --toggle split
 
 # toggle skip-empty-spaces mode (ctrl+left/right behavior)
-alt - y : if [ -f /tmp/skhd_skip_empty_spaces ]; then \
+alt - y : _L="$HOME/.local/share/skhd/usage.log"; mkdir -p "$(dirname "$_L")"; \
+          if [ -f /tmp/skhd_skip_empty_spaces ]; then \
             rm -f /tmp/skhd_skip_empty_spaces; \
+            printf '%s\t%s\t%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "Space Skip" "OFF" >> "$_L"; \
             osascript -e 'display notification "Visiting ALL spaces" with title "Space Skip: OFF"'; \
           else \
             touch /tmp/skhd_skip_empty_spaces; \
+            printf '%s\t%s\t%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "Space Skip" "ON" >> "$_L"; \
             osascript -e 'display notification "Skipping empty spaces" with title "Space Skip: ON"'; \
           fi
 
