@@ -32,6 +32,7 @@ final class Logger {
 struct Space: Decodable {
     let index: Int
     let label: String?
+    let type: String?
     let windows: [Int]
     let hasFocus: Bool
     let isVisible: Bool
@@ -39,6 +40,7 @@ struct Space: Decodable {
     enum CodingKeys: String, CodingKey {
         case index
         case label
+        case type
         case windows
         case hasFocus = "has-focus"
         case isVisible = "is-visible"
@@ -46,12 +48,14 @@ struct Space: Decodable {
 }
 
 struct Window: Decodable {
+    let id: Int
     let app: String
     let space: Int
     let isHidden: Bool
     let isMinimized: Bool
 
     enum CodingKeys: String, CodingKey {
+        case id
         case app
         case space
         case isHidden = "is-hidden"
@@ -173,6 +177,14 @@ final class YabaiClient {
     func focusSpace(_ index: Int) throws {
         _ = try run(["-m", "space", "--focus", String(index)])
     }
+
+    func setCurrentSpaceLayout(_ layout: String) throws {
+        _ = try run(["-m", "space", "--layout", layout])
+    }
+
+    func moveWindow(id: Int, toSpace index: Int) throws {
+        _ = try run(["-m", "window", String(id), "--space", String(index)])
+    }
 }
 
 final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate {
@@ -189,6 +201,9 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     private var spaces: [Space] = []
     private var appsBySpace: [Int: [String]] = [:]
     private var currentSpaceIndex: Int?
+    private var previousSpaceIndex: Int?
+    private var movementIndicator: String?
+    private var movementIndicatorExpiresAt: Date?
     private var lastError: String?
     private var lastLoggedState: String?
 
@@ -243,6 +258,45 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     @objc
+    private func reorderSpaces() {
+        do {
+            let originalSpace = currentSpaceIndex
+            let windows = try client.fetchWindows()
+
+            for window in windows {
+                guard let targetSpace = reorderTargetSpace(for: normalizedAppName(window.app)) else {
+                    continue
+                }
+
+                try client.moveWindow(id: window.id, toSpace: targetSpace)
+            }
+
+            if let originalSpace {
+                try client.focusSpace(originalSpace)
+            }
+
+            refresh(includeWindowDetails: true)
+            rebuildMenu()
+        } catch {
+            lastError = error.localizedDescription
+            rebuildMenu()
+        }
+    }
+
+    @objc
+    private func toggleSpaceLayout() {
+        do {
+            let nextLayout = currentSpace?.type == "float" ? "bsp" : "float"
+            try client.setCurrentSpaceLayout(nextLayout)
+            refresh(includeWindowDetails: true)
+            rebuildMenu()
+        } catch {
+            lastError = error.localizedDescription
+            rebuildMenu()
+        }
+    }
+
+    @objc
     private func quit() {
         NSApp.terminate(nil)
     }
@@ -250,7 +304,9 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func refresh(includeWindowDetails: Bool = false) {
         do {
             spaces = try client.fetchSpaces().sorted { $0.index < $1.index }
-            currentSpaceIndex = try client.fetchCurrentSpace().index
+            let newCurrentSpaceIndex = try client.fetchCurrentSpace().index
+            updateMovementIndicator(for: newCurrentSpaceIndex)
+            currentSpaceIndex = newCurrentSpaceIndex
             if includeWindowDetails {
                 appsBySpace = groupedApps(from: try client.fetchWindows())
             }
@@ -371,26 +427,55 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
+    private func reorderTargetSpace(for app: String) -> Int? {
+        switch app {
+        case "Chrome":
+            return 1
+        case "Slack":
+            return 2
+        case "Code":
+            return 3
+        case "Codex":
+            return 4
+        case "Zen", "Zen Browser":
+            return 5
+        case "WhatsApp", "Messages":
+            return 6
+        default:
+            return nil
+        }
+    }
+
     private func occupancyGlyph(for space: Space) -> String {
         if space.index == currentSpaceIndex {
-            return "◆"
+            return "▣"
         }
 
-        return space.windows.isEmpty ? "·" : "•"
+        return space.windows.isEmpty ? "○" : "•"
     }
 
     private func occupancyStrip() -> String {
-        spaces.map(occupancyGlyph(for:)).joined(separator: " ")
+        let strip = spaces.map(occupancyGlyph(for:)).joined(separator: " ")
+
+        if let movementPrefix = activeMovementIndicator() {
+            return "\(movementPrefix)  \(strip)"
+        }
+
+        return strip
     }
 
     private func occupancyTemplateStrip() -> String {
-        guard !spaces.isEmpty else {
-            return "• ◆ •"
+        let strip: String
+
+        if spaces.isEmpty {
+            strip = "• ▣ •"
+        } else {
+            strip = spaces.enumerated().map { index, _ in
+            index == max(spaces.count / 2, 0) ? "▣" : "•"
+            }.joined(separator: " ")
         }
 
-        return spaces.enumerated().map { index, _ in
-            index == max(spaces.count / 2, 0) ? "◆" : "•"
-        }.joined(separator: " ")
+        return "→  \(strip)"
     }
 
     private func occupancyTooltip() -> String {
@@ -431,17 +516,47 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     private func menuGlyph(for space: Space) -> String {
         if space.index == currentSpaceIndex {
-            return "◆"
+            return "▣"
         }
 
-        return space.windows.isEmpty ? "·" : "•"
+        return space.windows.isEmpty ? "○" : "•"
+    }
+
+    private func updateMovementIndicator(for newCurrentSpaceIndex: Int) {
+        defer { previousSpaceIndex = newCurrentSpaceIndex }
+
+        guard let previousSpaceIndex, previousSpaceIndex != newCurrentSpaceIndex else {
+            clearExpiredMovementIndicatorIfNeeded()
+            return
+        }
+
+        movementIndicator = newCurrentSpaceIndex < previousSpaceIndex ? "←" : "→"
+        movementIndicatorExpiresAt = Date().addingTimeInterval(60)
+    }
+
+    private func activeMovementIndicator() -> String? {
+        clearExpiredMovementIndicatorIfNeeded()
+        return movementIndicator
+    }
+
+    private func clearExpiredMovementIndicatorIfNeeded() {
+        guard let expiresAt = movementIndicatorExpiresAt else {
+            return
+        }
+
+        guard Date() >= expiresAt else {
+            return
+        }
+
+        movementIndicator = nil
+        movementIndicatorExpiresAt = nil
     }
 
     private func rebuildMenu() {
         menu.removeAllItems()
 
         if let current = currentSpace {
-            let orderedSpaces = [current] + spaces.filter { $0.index != current.index }
+            let orderedSpaces = spaces.sorted { $0.index < $1.index }
 
             for space in orderedSpaces {
                 let item = NSMenuItem(title: tooltipLine(for: space), action: #selector(focusSpace(_:)), keyEquivalent: "")
@@ -449,6 +564,12 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
                 item.representedObject = space.index
                 menu.addItem(item)
             }
+
+            menu.addItem(.separator())
+
+            let layoutTitle = current.type == "float" ? "Switch To Tiling" : "Switch To Floating"
+            menu.addItem(NSMenuItem(title: "Re-order", action: #selector(reorderSpaces), keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: layoutTitle, action: #selector(toggleSpaceLayout), keyEquivalent: ""))
         } else {
             let errorTitle = lastError ?? "Unable to read the current space."
             let errorItem = NSMenuItem(title: errorTitle, action: nil, keyEquivalent: "")

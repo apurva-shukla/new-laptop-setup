@@ -28,7 +28,7 @@ window-padding-balance = true
 # --- Minimalist UI (Yabai Style) ---
 # Hides the macOS title bar (stoplights). 
 # Since you use Yabai, you don't need the title bar taking up space.
-macos-titlebar-style = hidden
+macos-titlebar-style = transparent
 
 # --- Cursor ---
 cursor-style = block
