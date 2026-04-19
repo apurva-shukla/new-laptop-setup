@@ -217,7 +217,7 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     func menuWillOpen(_ menu: NSMenu) {
-        refresh()
+        refresh(includeWindowDetails: true)
         rebuildMenu()
     }
 
@@ -229,7 +229,7 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
 
         do {
             try client.focusSpace(index)
-            refresh()
+            refresh(includeWindowDetails: true)
         } catch {
             lastError = error.localizedDescription
             rebuildMenu()
@@ -238,7 +238,7 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     @objc
     private func refreshFromMenu() {
-        refresh()
+        refresh(includeWindowDetails: true)
         rebuildMenu()
     }
 
@@ -247,11 +247,13 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         NSApp.terminate(nil)
     }
 
-    private func refresh() {
+    private func refresh(includeWindowDetails: Bool = false) {
         do {
             spaces = try client.fetchSpaces().sorted { $0.index < $1.index }
             currentSpaceIndex = try client.fetchCurrentSpace().index
-            appsBySpace = groupedApps(from: try client.fetchWindows())
+            if includeWindowDetails {
+                appsBySpace = groupedApps(from: try client.fetchWindows())
+            }
             lastError = nil
             logCurrentStateIfNeeded()
             updateStatusTitle()
