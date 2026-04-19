@@ -32,14 +32,30 @@ final class Logger {
 struct Space: Decodable {
     let index: Int
     let label: String?
+    let windows: [Int]
     let hasFocus: Bool
     let isVisible: Bool
 
     enum CodingKeys: String, CodingKey {
         case index
         case label
+        case windows
         case hasFocus = "has-focus"
         case isVisible = "is-visible"
+    }
+}
+
+struct Window: Decodable {
+    let app: String
+    let space: Int
+    let isHidden: Bool
+    let isMinimized: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case app
+        case space
+        case isHidden = "is-hidden"
+        case isMinimized = "is-minimized"
     }
 }
 
@@ -128,6 +144,32 @@ final class YabaiClient {
         }
     }
 
+    func fetchCurrentSpace() throws -> Space {
+        let output = try run(["-m", "query", "--spaces", "--space"])
+        guard let data = output.data(using: .utf8) else {
+            throw YabaiError.invalidOutput
+        }
+
+        do {
+            return try decoder.decode(Space.self, from: data)
+        } catch {
+            throw YabaiError.invalidOutput
+        }
+    }
+
+    func fetchWindows() throws -> [Window] {
+        let output = try run(["-m", "query", "--windows"])
+        guard let data = output.data(using: .utf8) else {
+            throw YabaiError.invalidOutput
+        }
+
+        do {
+            return try decoder.decode([Window].self, from: data)
+        } catch {
+            throw YabaiError.invalidOutput
+        }
+    }
+
     func focusSpace(_ index: Int) throws {
         _ = try run(["-m", "space", "--focus", String(index)])
     }
@@ -138,8 +180,15 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     private let logger = Logger()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
+    private let hiddenSummaryApps: Set<String> = [
+        "Claude",
+        "CurrentSpaceMenu",
+        "Granola",
+    ]
     private var refreshTimer: Timer?
     private var spaces: [Space] = []
+    private var appsBySpace: [Int: [String]] = [:]
+    private var currentSpaceIndex: Int?
     private var lastError: String?
     private var lastLoggedState: String?
 
@@ -201,11 +250,15 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func refresh() {
         do {
             spaces = try client.fetchSpaces().sorted { $0.index < $1.index }
+            currentSpaceIndex = try client.fetchCurrentSpace().index
+            appsBySpace = groupedApps(from: try client.fetchWindows())
             lastError = nil
             logCurrentStateIfNeeded()
             updateStatusTitle()
         } catch {
             spaces = []
+            appsBySpace = [:]
+            currentSpaceIndex = nil
             lastError = error.localizedDescription
             logCurrentStateIfNeeded()
             updateStatusTitle()
@@ -220,25 +273,36 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         let title: String
         let toolTip: String
 
-        if let current = currentSpace {
-            title = "Space \(current.index)"
-
-            if let label = normalizedLabel(for: current), !label.isEmpty {
-                toolTip = "Current space: \(current.index) (\(label))"
-            } else {
-                toolTip = "Current space: \(current.index)"
-            }
+        if currentSpace != nil, !spaces.isEmpty {
+            title = occupancyStrip()
+            toolTip = occupancyTooltip()
         } else {
             title = "--"
             toolTip = lastError ?? "No focused space detected."
         }
 
-        button.title = title
+        let style = NSMutableParagraphStyle()
+        style.alignment = .center
+
+        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .paragraphStyle: style,
+        ]
+
+        let templateTitle = occupancyTemplateStrip()
+        let templateWidth = (templateTitle as NSString).size(withAttributes: attributes).width
+        statusItem.length = max(templateWidth + 28, 92)
+        button.attributedTitle = NSAttributedString(string: title, attributes: attributes)
         button.toolTip = toolTip
     }
 
     private var currentSpace: Space? {
-        spaces.first(where: { $0.hasFocus }) ?? spaces.first(where: { $0.isVisible })
+        if let currentSpaceIndex {
+            return spaces.first(where: { $0.index == currentSpaceIndex })
+        }
+
+        return spaces.first(where: { $0.hasFocus }) ?? spaces.first(where: { $0.isVisible })
     }
 
     private func logCurrentStateIfNeeded() {
@@ -272,34 +336,115 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         return label
     }
 
+    private func groupedApps(from windows: [Window]) -> [Int: [String]] {
+        var grouped: [Int: [String]] = [:]
+
+        for window in windows where !window.isHidden && !window.isMinimized {
+            let appName = normalizedAppName(window.app)
+            var apps = grouped[window.space, default: []]
+            if !apps.contains(appName) {
+                apps.append(appName)
+            }
+            grouped[window.space] = apps
+        }
+
+        for (space, apps) in grouped {
+            grouped[space] = apps.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        }
+
+        return grouped
+    }
+
+    private func normalizedAppName(_ app: String) -> String {
+        let cleaned = app
+            .replacingOccurrences(of: "\u{200E}", with: "")
+            .replacingOccurrences(of: "\u{200F}", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        switch cleaned {
+        case "Google Chrome":
+            return "Chrome"
+        default:
+            return cleaned
+        }
+    }
+
+    private func occupancyGlyph(for space: Space) -> String {
+        if space.index == currentSpaceIndex {
+            return "◆"
+        }
+
+        return space.windows.isEmpty ? "·" : "•"
+    }
+
+    private func occupancyStrip() -> String {
+        spaces.map(occupancyGlyph(for:)).joined(separator: " ")
+    }
+
+    private func occupancyTemplateStrip() -> String {
+        guard !spaces.isEmpty else {
+            return "• ◆ •"
+        }
+
+        return spaces.enumerated().map { index, _ in
+            index == max(spaces.count / 2, 0) ? "◆" : "•"
+        }.joined(separator: " ")
+    }
+
+    private func occupancyTooltip() -> String {
+        guard let current = currentSpace else {
+            return lastError ?? "No focused space detected."
+        }
+
+        var lines: [String] = [tooltipLine(for: current)]
+
+        for space in spaces where space.index != current.index {
+            lines.append(tooltipLine(for: space))
+        }
+
+        return lines.joined(separator: "\n")
+    }
+
+    private func tooltipLine(for space: Space) -> String {
+        let glyph = menuGlyph(for: space)
+        let details = spaceDetails(for: space)
+        return "\(glyph)  \(space.index) \(details)"
+    }
+
+    private func spaceDetails(for space: Space) -> String {
+        let visibleApps = (appsBySpace[space.index] ?? []).filter { !hiddenSummaryApps.contains($0) }
+        let apps = visibleApps.isEmpty ? (appsBySpace[space.index] ?? []) : visibleApps
+
+        guard !apps.isEmpty else {
+            return "Empty"
+        }
+
+        if apps.count <= 2 {
+            return apps.joined(separator: ", ")
+        }
+
+        let leadingApps = apps.prefix(2).joined(separator: ", ")
+        return "\(leadingApps) +\(apps.count - 2)"
+    }
+
+    private func menuGlyph(for space: Space) -> String {
+        if space.index == currentSpaceIndex {
+            return "◆"
+        }
+
+        return space.windows.isEmpty ? "·" : "•"
+    }
+
     private func rebuildMenu() {
         menu.removeAllItems()
 
         if let current = currentSpace {
-            let currentTitle: String
-            if let label = normalizedLabel(for: current) {
-                currentTitle = "Current Space: \(current.index)  \(label)"
-            } else {
-                currentTitle = "Current Space: \(current.index)"
-            }
+            let orderedSpaces = [current] + spaces.filter { $0.index != current.index }
 
-            let headerItem = NSMenuItem(title: currentTitle, action: nil, keyEquivalent: "")
-            headerItem.isEnabled = false
-            menu.addItem(headerItem)
-            menu.addItem(.separator())
-
-            for space in spaces {
-                let title: String
-                if let label = normalizedLabel(for: space) {
-                    title = "\(space.index)  \(label)"
-                } else {
-                    title = String(space.index)
-                }
-
-                let item = NSMenuItem(title: title, action: #selector(focusSpace(_:)), keyEquivalent: "")
+            for space in orderedSpaces {
+                let item = NSMenuItem(title: tooltipLine(for: space), action: #selector(focusSpace(_:)), keyEquivalent: "")
                 item.target = self
                 item.representedObject = space.index
-                item.state = space.hasFocus ? .on : .off
                 menu.addItem(item)
             }
         } else {
