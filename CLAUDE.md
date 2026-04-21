@@ -33,8 +33,8 @@ Dotfiles and config for macOS dev environment. Idempotent bootstrap script symli
 
 ### tmux (Prefix: Ctrl+Space)
 - `prefix + i/j/k/l` — Navigate panes (up/left/down/right)
-- `prefix + s` — Horizontal split
-- `prefix + v` — Vertical split
+- `prefix + \` or `alt + \` — Horizontal split (side-by-side)
+- `prefix + -` or `alt + -` — Vertical split (stacked)
 - `alt + 1-9` — Switch window (no prefix needed)
 - `prefix + r` — Reload config
 - Mouse mode is ON
