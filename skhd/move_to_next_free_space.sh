@@ -83,8 +83,7 @@ if [ -z "$target_space" ]; then
   exit 0
 fi
 
-yabai -m window --space "$target_space"
-yabai -m space --focus "$target_space"
+yabai -m window --space "$target_space" --focus
 
 log_action "Move → Free Space" "$target_space $target_label"
 notify "Move → Free Space" "$target_space $target_label"

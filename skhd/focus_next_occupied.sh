@@ -11,7 +11,12 @@ fi
 
 SKIP_FILE="/tmp/skhd_skip_empty_spaces"
 SKHD_LOG="${SKHD_LOG:-$HOME/.local/share/skhd/usage.log}"
-_log() { mkdir -p "$(dirname "$SKHD_LOG")"; printf '%s\t%s\t%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" "$2" >> "$SKHD_LOG"; }
+_log() {
+    (
+        mkdir -p "$(dirname "$SKHD_LOG")"
+        printf '%s\t%s\t%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" "$2" >> "$SKHD_LOG"
+    ) >/dev/null 2>&1 &
+}
 
 # If skip mode is off, just go to next space directly
 if [ ! -f "$SKIP_FILE" ]; then
@@ -26,31 +31,22 @@ command -v jq >/dev/null 2>&1 || exit 0
 current="$(yabai -m query --spaces --space 2>/dev/null | jq -r '.index // empty' 2>/dev/null)" || exit 0
 [[ "$current" =~ ^[0-9]+$ ]] || exit 0
 
-# Get list of occupied spaces (spaces with visible windows)
-occupied="$(yabai -m query --windows 2>/dev/null | jq -r '
-  [.[] | select(."is-minimized" == false and ."is-hidden" == false) | .space] | unique | sort | .[]
-' 2>/dev/null)" || exit 0
-
-[ -n "$occupied" ] || exit 0
-
-# Find next occupied space after current
-next=""
-for s in $occupied; do
-    if [ "$s" -gt "$current" ]; then
-        next=$s
-        break
-    fi
-done
-
-# Wrap around if no next found
-if [ -z "$next" ]; then
-    for s in $occupied; do
-        if [ "$s" -ne "$current" ]; then
-            next=$s
-            break
-        fi
-    done
-fi
+next="$(
+    yabai -m query --windows 2>/dev/null | jq -r --argjson current "$current" '
+      [
+        .[]
+        | select(."is-minimized" == false and ."is-hidden" == false)
+        | .space
+      ]
+      | unique
+      | sort as $occupied
+      | (
+          ($occupied | map(select(. > $current)) | first)
+          // ($occupied | map(select(. != $current)) | first)
+          // empty
+        )
+    ' 2>/dev/null
+)" || exit 0
 
 # Focus the space if found
 if [ -n "$next" ]; then
