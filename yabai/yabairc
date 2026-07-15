@@ -38,6 +38,7 @@ add_signal() {
 reset_signals
 reset_rules
 add_signal dock_did_restart dock_did_restart "sudo yabai --load-sa"
+add_signal refresh_current_space_menu space_changed "pkill -USR1 -x CurrentSpaceMenu 2>/dev/null || true"
 sudo yabai --load-sa
 
 # SketchyBar is disabled, so yabai should not reserve bar space or notify it.

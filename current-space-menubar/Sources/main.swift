@@ -192,6 +192,7 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
     private let logger = Logger()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
+    private var refreshSignalSource: DispatchSourceSignal?
     private let hiddenSummaryApps: Set<String> = [
         "Claude",
         "CurrentSpaceMenu",
@@ -220,8 +221,9 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
 
         refresh()
+        startRefreshSignalListener()
 
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             self?.refresh()
         }
         RunLoop.main.add(refreshTimer!, forMode: .common)
@@ -229,6 +231,7 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
+        refreshSignalSource?.cancel()
     }
 
     func menuWillOpen(_ menu: NSMenu) {
@@ -301,10 +304,23 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         NSApp.terminate(nil)
     }
 
+    private func startRefreshSignalListener() {
+        signal(SIGUSR1, SIG_IGN)
+
+        let source = DispatchSource.makeSignalSource(signal: SIGUSR1, queue: .main)
+        source.setEventHandler { [weak self] in
+            self?.refresh()
+        }
+        source.resume()
+        refreshSignalSource = source
+    }
+
     private func refresh(includeWindowDetails: Bool = false) {
         do {
             spaces = try client.fetchSpaces().sorted { $0.index < $1.index }
-            let newCurrentSpaceIndex = try client.fetchCurrentSpace().index
+            guard let newCurrentSpaceIndex = focusedSpaceIndex(from: spaces) else {
+                throw YabaiError.invalidOutput
+            }
             updateMovementIndicator(for: newCurrentSpaceIndex)
             currentSpaceIndex = newCurrentSpaceIndex
             if includeWindowDetails {
@@ -323,36 +339,42 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
+    private func focusedSpaceIndex(from spaces: [Space]) -> Int? {
+        spaces.first(where: { $0.hasFocus })?.index ?? spaces.first(where: { $0.isVisible })?.index
+    }
+
     private func updateStatusTitle() {
         guard let button = statusItem.button else {
             return
         }
 
-        let title: String
+        let title: NSAttributedString
         let toolTip: String
 
         if currentSpace != nil, !spaces.isEmpty {
             title = occupancyStrip()
             toolTip = occupancyTooltip()
         } else {
-            title = "--"
+            title = NSAttributedString(string: "--", attributes: statusAttributes(weight: .semibold))
             toolTip = lastError ?? "No focused space detected."
         }
 
+        let templateTitle = occupancyTemplateStrip()
+        let templateWidth = (templateTitle as NSString).size(withAttributes: statusAttributes(weight: .semibold)).width
+        statusItem.length = max(templateWidth + 28, 92)
+        button.attributedTitle = title
+        button.toolTip = toolTip
+    }
+
+    private func statusAttributes(weight: NSFont.Weight, color: NSColor = .labelColor) -> [NSAttributedString.Key: Any] {
         let style = NSMutableParagraphStyle()
         style.alignment = .center
 
-        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
+        return [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: weight),
+            .foregroundColor: color,
             .paragraphStyle: style,
         ]
-
-        let templateTitle = occupancyTemplateStrip()
-        let templateWidth = (templateTitle as NSString).size(withAttributes: attributes).width
-        statusItem.length = max(templateWidth + 28, 92)
-        button.attributedTitle = NSAttributedString(string: title, attributes: attributes)
-        button.toolTip = toolTip
     }
 
     private var currentSpace: Space? {
@@ -446,36 +468,40 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
-    private func occupancyGlyph(for space: Space) -> String {
+    private func occupancyToken(for space: Space) -> String {
         if space.index == currentSpaceIndex {
-            return "▣"
+            return "[\(space.index)]"
         }
 
-        return space.windows.isEmpty ? "○" : "•"
+        return "\(space.index)"
     }
 
-    private func occupancyStrip() -> String {
-        let strip = spaces.map(occupancyGlyph(for:)).joined(separator: " ")
+    private func occupancyStrip() -> NSAttributedString {
+        let strip = NSMutableAttributedString()
 
-        if let movementPrefix = activeMovementIndicator() {
-            return "\(movementPrefix)  \(strip)"
+        for (offset, space) in spaces.enumerated() {
+            if offset > 0 {
+                strip.append(NSAttributedString(string: " ", attributes: statusAttributes(weight: .regular)))
+            }
+
+            let isCurrent = space.index == currentSpaceIndex
+            let isOccupied = !space.windows.isEmpty
+            let color: NSColor = isCurrent || isOccupied ? .labelColor : .secondaryLabelColor
+            let weight: NSFont.Weight = isCurrent || isOccupied ? .semibold : .regular
+            strip.append(NSAttributedString(string: occupancyToken(for: space), attributes: statusAttributes(weight: weight, color: color)))
         }
 
         return strip
     }
 
     private func occupancyTemplateStrip() -> String {
-        let strip: String
-
         if spaces.isEmpty {
-            strip = "• ▣ •"
-        } else {
-            strip = spaces.enumerated().map { index, _ in
-            index == max(spaces.count / 2, 0) ? "▣" : "•"
-            }.joined(separator: " ")
+            return "1 [2] 3"
         }
 
-        return "→  \(strip)"
+        return spaces.enumerated().map { index, space in
+            index == max(spaces.count / 2, 0) ? "[\(space.index)]" : "\(space.index)"
+        }.joined(separator: " ")
     }
 
     private func occupancyTooltip() -> String {
@@ -516,10 +542,10 @@ final class SpaceMenuController: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     private func menuGlyph(for space: Space) -> String {
         if space.index == currentSpaceIndex {
-            return "▣"
+            return ">"
         }
 
-        return space.windows.isEmpty ? "○" : "•"
+        return space.windows.isEmpty ? "-" : "*"
     }
 
     private func updateMovementIndicator(for newCurrentSpaceIndex: Int) {

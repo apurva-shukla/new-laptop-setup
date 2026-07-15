@@ -31,7 +31,8 @@ alt - r : ~/.config/skhd/notify.sh "Layout" "Rotated 90°" yabai -m space --rota
 alt - m : ~/.config/skhd/notify.sh "Layout" "Mirrored Y-axis" yabai -m space --mirror y-axis
 
 # float / unfloat window and center on screen
-alt - t : ~/.config/skhd/notify.sh "Float" "Toggled float" bash -c 'yabai -m window --toggle float; if [ "$(yabai -m query --windows --window | jq -r ".\"is-floating\"")" = "true" ]; then yabai -m window --sub-layer normal; yabai -m window --grid 4:4:1:1:2:2; else yabai -m window --sub-layer normal; fi'
+# alt - t disabled: no manual float toggle
+# alt - t : ~/.config/skhd/notify.sh "Float" "Toggled float" bash -c 'yabai -m window --toggle float; if [ "$(yabai -m query --windows --window | jq -r ".\"is-floating\"")" = "true" ]; then yabai -m window --sub-layer normal; yabai -m window --grid 4:4:1:1:2:2; else yabai -m window --sub-layer normal; fi'
 shift + alt - t : bash ~/.config/skhd/park_window.sh
 ctrl + alt - t : bash ~/.config/skhd/raise_floating_window.sh
 
@@ -64,15 +65,15 @@ ctrl + alt + cmd - k : yabai -m window --resize top:0:40
 ctrl + alt + cmd - j : yabai -m window --resize right:-40:0
 
 # restart yabai
-ctrl + alt + cmd - r : ~/.config/skhd/notify.sh "yabai" "Restarting…" launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+ctrl + alt + cmd - r : ~/.config/skhd/notify.sh "yabai" "Restarting…" launchctl kickstart -k "gui/${UID}/com.koekeishiya.yabai"
 
-# switch to space (Cmd + number, resolved by label)
-cmd - 1 : yabai -m space --focus chrome
-cmd - 2 : yabai -m space --focus slack
-cmd - 3 : yabai -m space --focus flex1
-cmd - 4 : yabai -m space --focus flex2
-cmd - 5 : yabai -m space --focus zen
-cmd - 6 : yabai -m space --focus messaging
+# switch to space by Mission Control index
+cmd - 1 : yabai -m space --focus 1
+cmd - 2 : yabai -m space --focus 2
+cmd - 3 : yabai -m space --focus 3
+cmd - 4 : yabai -m space --focus 4
+cmd - 5 : yabai -m space --focus 5
+cmd - 6 : yabai -m space --focus 6
 
 # switch to prev/next occupied space (Ctrl + arrows) - skips empty spaces
 ctrl - left : ~/.config/skhd/focus_prev_occupied.sh
@@ -80,10 +81,10 @@ ctrl - right : ~/.config/skhd/focus_next_occupied.sh
 alt - o : ~/.config/skhd/space_overview.sh
 shift + alt - o : ~/.config/skhd/move_to_next_free_space.sh
 
-# move window to space (Shift + Cmd + number, resolved by label)
-shift + cmd - 1 : yabai -m window --space chrome --focus
-shift + cmd - 2 : yabai -m window --space slack --focus
-shift + cmd - 3 : yabai -m window --space flex1 --focus
-shift + cmd - 4 : yabai -m window --space flex2 --focus
-shift + cmd - 5 : yabai -m window --space zen --focus
-shift + cmd - 6 : yabai -m window --space messaging --focus
+# move window to space by Mission Control index and follow
+shift + cmd - 1 : yabai -m window --space 1 --focus
+shift + cmd - 2 : yabai -m window --space 2 --focus
+shift + cmd - 3 : yabai -m window --space 3 --focus
+shift + cmd - 4 : yabai -m window --space 4 --focus
+shift + cmd - 5 : yabai -m window --space 5 --focus
+shift + cmd - 6 : yabai -m window --space 6 --focus
