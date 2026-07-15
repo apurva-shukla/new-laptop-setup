@@ -9,8 +9,8 @@
   <array>
     <string>/usr/bin/env</string>
     <string>ELGATO_KEY_LIGHT_URL=http://192.168.1.214:9123</string>
-    <string>ELGATO_BRIGHTNESS=55</string>
-    <string>ELGATO_TEMPERATURE=213</string>
+    <string>ELGATO_BRIGHTNESS=20</string>
+    <string>ELGATO_TEMPERATURE=270</string>
     <string>ELGATO_HOME_NETWORK_PREFIX=192.168.1.</string>
     <string>ELGATO_HOME_INTERFACE=en0</string>
     <string>ELGATO_TURN_OFF_AFTER=1</string>
