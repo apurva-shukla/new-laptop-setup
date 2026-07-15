@@ -1,0 +1,206 @@
+# AeroSpace config — 1:1 port of yabai (~/.config/yabai/yabairc) + skhd (~/.config/skhd/skhdrc)
+# Keybindings are kept identical wherever AeroSpace has an equivalent.
+# Gaps with no equivalent are noted inline.
+
+start-at-login = true
+
+# yabai's auto_balance has NO equivalent here — intentionally. AeroSpace keeps
+# your split ratios as you set them (this is what stops the jitter).
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Visible strip (px) of background windows in accordion layout (alt-a)
+accordion-padding = 10
+
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# JankyBorders — same args as yabairc:116
+after-startup-command = [
+  'exec-and-forget pkill -x borders; /opt/homebrew/bin/borders active_color=0xff00ff00 inactive_color=0x00000000 width=6.0 style=round'
+]
+
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+# Tahoe raise-race workaround (AeroSpace #1728): verify+retry the window raise
+# after every focus change. See raise_focused.sh for details.
+on-focus-changed = ['exec-and-forget ~/.config/aerospace/raise_focused.sh']
+
+[key-mapping]
+preset = 'qwerty'
+
+# yabai: top_padding 0, bottom/left/right 4, window_gap 4
+# (outer.top is relative to the visible frame, so 0 still sits below the menu bar)
+[gaps]
+inner.horizontal = 4
+inner.vertical = 4
+outer.top = 0
+outer.bottom = 4
+outer.left = 4
+outer.right = 4
+
+[mode.main.binding]
+
+# ── focus (was: yabai --focus west/south/north/east) ────────────────────────
+alt-j = 'focus left'
+alt-k = 'focus down'
+alt-i = 'focus up'
+alt-l = 'focus right'
+
+# ── layout toggles ───────────────────────────────────────────────────────────
+# was: alt-s = toggle split → toggles the container between horizontal/vertical tiles
+alt-s = 'layout tiles horizontal vertical'
+# NEW binding (was unbound): accordion — the 13" small-screen "stack" mode.
+# All windows in the container go ~full screen, stacked; hidden ones peek in as
+# 30px strips. alt-j/alt-l cycles through the stack. alt-b returns to tiles.
+alt-a = 'layout accordion horizontal vertical'
+# was: alt-r = rotate 90 (no equivalent) → flatten-workspace-tree is "reset layout"
+alt-r = 'flatten-workspace-tree'
+# alt-m (mirror y-axis): no AeroSpace equivalent — left unbound.
+# alt-y (skip-empty-spaces toggle): obsolete — AeroSpace always skips empty
+#   workspaces in next/prev, because empty workspaces don't exist.
+
+# ── move windows ─────────────────────────────────────────────────────────────
+# was: shift+alt = swap. AeroSpace's 'move' relocates the window in the tree
+# (in practice this looks like a swap for two side-by-side windows).
+alt-shift-j = 'move left'
+alt-shift-k = 'move down'
+alt-shift-i = 'move up'
+alt-shift-l = 'move right'
+
+# was: shift+cmd = warp (re-insert into neighbor's slot). 'join-with' nests the
+# window into a shared container with the neighbor — the closest analog.
+cmd-shift-j = 'join-with left'
+cmd-shift-k = 'join-with down'
+cmd-shift-i = 'join-with up'
+cmd-shift-l = 'join-with right'
+
+# ── float / tile (was: alt-b bsp space, alt-f float space) ───────────────────
+# alt-b = "back to side-by-side tiles" — the escape hatch from accordion (alt-a)
+# and the closest analog to yabai's "space → bsp".
+alt-b = 'layout h_tiles'
+# Difference from yabai: AeroSpace floats per-WINDOW, not per-space.
+alt-f = 'layout floating'
+# was: shift+alt-t = park_window.sh (float + center + lower). AeroSpace has no
+# z-order control; this toggles float, which covers the "get it out of the
+# tiling" half of parking.
+alt-shift-t = 'layout floating tiling'
+# ctrl+alt-t (raise floating window): no equivalent — focusing a floating
+# window raises it natively; left unbound.
+
+# ── resize (was: ctrl+alt = grow 40px, ctrl+alt+cmd = shrink 40px) ───────────
+# AeroSpace resizes the window, not a specific edge, so j/l both mean width
+# and i/k both mean height. Grow/shrink muscle memory is preserved.
+ctrl-alt-j = 'resize width +40'
+ctrl-alt-l = 'resize width +40'
+ctrl-alt-i = 'resize height +40'
+ctrl-alt-k = 'resize height +40'
+ctrl-alt-cmd-j = 'resize width -40'
+ctrl-alt-cmd-l = 'resize width -40'
+ctrl-alt-cmd-i = 'resize height -40'
+ctrl-alt-cmd-k = 'resize height -40'
+
+# was: restart yabai
+ctrl-alt-cmd-r = 'reload-config'
+
+# ── workspaces (was: cmd-1..6 focus space, shift+cmd-1..6 move window + follow)
+# Named with number prefixes so ordering matches your old space indexes.
+cmd-1 = 'workspace 1-chrome'
+cmd-2 = 'workspace 2-slack'
+cmd-3 = 'workspace 3-flex1'
+cmd-4 = 'workspace 4-flex2'
+cmd-5 = 'workspace 5-zen'
+cmd-6 = 'workspace 6-messaging'
+
+cmd-shift-1 = 'move-node-to-workspace --focus-follows-window 1-chrome'
+cmd-shift-2 = 'move-node-to-workspace --focus-follows-window 2-slack'
+cmd-shift-3 = 'move-node-to-workspace --focus-follows-window 3-flex1'
+cmd-shift-4 = 'move-node-to-workspace --focus-follows-window 4-flex2'
+cmd-shift-5 = 'move-node-to-workspace --focus-follows-window 5-zen'
+cmd-shift-6 = 'move-node-to-workspace --focus-follows-window 6-messaging'
+
+# was: ctrl-left/right = focus_prev/next_occupied.sh — built in now, since
+# next/prev only ever visits workspaces that have windows.
+# NOTE: disable "Move left/right a space" in System Settings → Keyboard →
+# Keyboard Shortcuts → Mission Control, or macOS swallows these keys.
+ctrl-left = 'workspace --wrap-around prev'
+ctrl-right = 'workspace --wrap-around next'
+
+# was: alt-o = space_overview.sh, shift+alt-o = move_to_next_free_space.sh
+alt-o = 'exec-and-forget ~/.config/aerospace/space_overview.sh'
+alt-shift-o = 'exec-and-forget ~/.config/aerospace/move_to_next_free_space.sh'
+
+# ── app → workspace rules (was: yabai rules + window_created focus signals) ──
+# The exec-and-forget focuses the workspace after routing, replicating your
+# "jump to the space when the app opens a window" signals.
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = ['move-node-to-workspace 1-chrome', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 1-chrome']
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = ['move-node-to-workspace 2-slack', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 2-slack']
+
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace 5-zen', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 5-zen']
+
+[[on-window-detected]]
+if.app-id = 'net.whatsapp.WhatsApp'
+run = ['move-node-to-workspace 6-messaging', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 6-messaging']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = ['move-node-to-workspace 6-messaging', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 6-messaging']
+
+# ── floating apps (was: manage=off rules) ────────────────────────────────────
+# AeroSpace already floats dialogs/panels by default; these cover the full apps.
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.reminders'
+run = 'layout floating'
+
+# yabai had an exception to tile Raycast's "AI Chat" window; rules here can't
+# express "unless title = X", so all Raycast windows float. Tile AI Chat
+# manually with alt-b if you want it managed.
+[[on-window-detected]]
+if.app-id = 'com.raycast.macos'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.loom.desktop'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.timpler.screenstudio'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.hegenberg.BetterTouchTool'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'cc.ffitch.shottr'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.prakashjoshipax.VoiceInk'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.ActivityMonitor'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'me.damir.dropover-mac'
+run = 'layout floating'
+
+# was: title="[Bb]itwarden" manage=off
+[[on-window-detected]]
+if.window-title-regex-substring = 'itwarden'
+run = 'layout floating'

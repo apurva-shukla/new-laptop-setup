@@ -81,6 +81,7 @@ fi
 mkdir -p "$CONFIG_HOME"
 mkdir -p "$HOME/Library/LaunchAgents"
 
+link_item "$REPO_DIR/aerospace" "$CONFIG_HOME/aerospace"
 link_item "$REPO_DIR/ghostty" "$CONFIG_HOME/ghostty"
 link_item "$REPO_DIR/skhd" "$CONFIG_HOME/skhd"
 link_item "$REPO_DIR/yabai" "$CONFIG_HOME/yabai"

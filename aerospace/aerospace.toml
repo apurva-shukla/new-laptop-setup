@@ -1,0 +1,144 @@
+# AeroSpace config — simplified 2026-07-11.
+# Previous (full yabai-port) config: aerospace.toml.full-backup
+#
+# The whole mental model:
+#   - 6 workspaces, cmd-1..6 to go there, cmd-shift-1..6 to send a window there
+#   - alt-j/k/i/l moves focus, add shift to move the window
+#   - alt-a stacks windows fullscreen-style (accordion), alt-b un-stacks to tiles
+#   - alt-r fixes any weird layout
+#   - never use the green fullscreen button
+
+start-at-login = true
+
+# Visible strip (px) of hidden windows in accordion (alt-a)
+accordion-padding = 30
+
+# Green focus border (JankyBorders)
+after-startup-command = [
+  'exec-and-forget pkill -x borders; /opt/homebrew/bin/borders active_color=0xff00ff00 inactive_color=0x00000000 width=6.0 style=round'
+]
+
+# Workaround for macOS Tahoe raise bug (AeroSpace #1728): sometimes a focused
+# window doesn't come to the front. This re-raises it after every focus change.
+# Delete this (and raise_focused.sh) once a `brew upgrade aerospace` fixes it.
+on-focus-changed = ['exec-and-forget ~/.config/aerospace/raise_focused.sh']
+
+[gaps]
+inner.horizontal = 4
+inner.vertical = 4
+outer.top = 0
+outer.bottom = 4
+outer.left = 4
+outer.right = 4
+
+[mode.main.binding]
+
+# focus / move window
+alt-j = 'focus left'
+alt-k = 'focus down'
+alt-i = 'focus up'
+alt-l = 'focus right'
+alt-shift-j = 'move left'
+alt-shift-k = 'move down'
+alt-shift-i = 'move up'
+alt-shift-l = 'move right'
+
+# layouts: stack (accordion) <-> side-by-side (tiles); float toggle; reset
+alt-a = 'layout accordion horizontal vertical'
+alt-b = 'layout h_tiles'
+alt-f = 'layout floating tiling'
+alt-r = 'flatten-workspace-tree'
+
+# resize focused window
+alt-minus = 'resize smart -50'
+alt-equal = 'resize smart +50'
+
+# workspaces
+cmd-1 = 'workspace 1-chrome'
+cmd-2 = 'workspace 2-slack'
+cmd-3 = 'workspace 3-flex1'
+cmd-4 = 'workspace 4-flex2'
+cmd-5 = 'workspace 5-zen'
+cmd-6 = 'workspace 6-messaging'
+# alt-shift like the directional move keys — cmd-shift-1/3/4 stay free for
+# Loom and macOS screenshots
+alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1-chrome'
+alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2-slack'
+alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3-flex1'
+alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4-flex2'
+alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5-zen'
+alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6-messaging'
+
+# cycle through occupied workspaces (empty ones are skipped automatically)
+ctrl-left = 'workspace --wrap-around prev'
+ctrl-right = 'workspace --wrap-around next'
+
+ctrl-alt-cmd-r = 'reload-config'
+
+# ── apps that live on a fixed workspace (and jump you there on open) ─────────
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = ['move-node-to-workspace 1-chrome', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 1-chrome']
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = ['move-node-to-workspace 2-slack', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 2-slack']
+
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace 5-zen', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 5-zen']
+
+[[on-window-detected]]
+if.app-id = 'net.whatsapp.WhatsApp'
+run = ['move-node-to-workspace 6-messaging', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 6-messaging']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = ['move-node-to-workspace 6-messaging', 'exec-and-forget /opt/homebrew/bin/aerospace workspace 6-messaging']
+
+# ── utility apps that should float, never tile ───────────────────────────────
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.reminders'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.raycast.macos'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.loom.desktop'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.timpler.screenstudio'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.hegenberg.BetterTouchTool'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'cc.ffitch.shottr'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.prakashjoshipax.VoiceInk'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.ActivityMonitor'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'me.damir.dropover-mac'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'itwarden'
+run = 'layout floating'

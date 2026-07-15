@@ -14,7 +14,8 @@ Dotfiles and config for macOS dev environment. Idempotent bootstrap script symli
 |------|---------|-------------|
 | Ghostty | Terminal emulator | `ghostty/config` |
 | tmux | Terminal multiplexer | `tmux/tmux.conf` |
-| yabai | Tiling window manager | `yabai/yabairc` |
+| AeroSpace | Tiling window manager | `aerospace/aerospace.toml` |
+| yabai | Tiling window manager (legacy) | `yabai/yabairc` |
 | skhd | Hotkey daemon | `skhd/skhdrc` |
 | sketchybar | Menu bar | `sketchybar/` |
 | Starship | Shell prompt | `starship.toml` |

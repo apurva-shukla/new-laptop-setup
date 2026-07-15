@@ -5,7 +5,11 @@
 raycast/config.json
 bettertouchtool/bettertouchtool.bttlicense
 
+# Runtime logs
+aerospace/raise-debug.log
+
 # Backups and editor swap files
 *.bak
 *.swp
 *.swo
+aerospace/topwin
