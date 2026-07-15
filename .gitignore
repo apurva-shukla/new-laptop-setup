@@ -13,3 +13,4 @@ aerospace/raise-debug.log
 *.swp
 *.swo
 aerospace/topwin
+__pycache__/
