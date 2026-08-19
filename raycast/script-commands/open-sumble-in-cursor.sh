@@ -12,7 +12,7 @@
 set -euo pipefail
 
 sumble_dir="/Users/apurvashukla/code/sumble"
-cursor_bin="/opt/homebrew/bin/cursor"
+ cursor_bin="/opt/homebrew/bin/code"
 
 if [[ ! -d "$sumble_dir" ]]; then
   echo "Sumble folder not found: $sumble_dir"
