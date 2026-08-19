@@ -1,0 +1,27 @@
+# Herdr replaces tmux as Ghostty's outer multiplexer.
+onboarding = false
+
+[keys]
+# Preserve the prefix used by the existing tmux setup.
+prefix = "ctrl+space"
+
+# Keep the tmux-style layout vocabulary while Herdr owns tabs and panes.
+new_tab = "prefix+c"
+split_horizontal = "prefix+minus"
+# Ghostty reports | as Shift+Backslash through its enhanced keyboard protocol.
+split_vertical = "prefix+shift+backslash"
+new_workspace = "prefix+w"
+workspace_picker = "prefix+space"
+
+# IJKL pane navigation: I up, J left, K down, L right.
+focus_pane_up = "prefix+i"
+focus_pane_left = "prefix+j"
+focus_pane_down = "prefix+k"
+focus_pane_right = "prefix+l"
+navigate_pane_up = "i"
+navigate_pane_left = "j"
+navigate_pane_down = "k"
+navigate_pane_right = "l"
+
+[ui]
+agent_panel_sort = "priority"

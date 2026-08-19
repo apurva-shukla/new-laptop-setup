@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>tmux cheatsheet</title>
+<style>
+  /* A4 sheet; the A6 card is centred on it with a trim guide to cut along. */
+  @page { size: 210mm 297mm; margin: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 210mm; height: 297mm;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #000; background: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* centre the card on the sheet */
+  body { display: flex; align-items: center; justify-content: center; }
+
+  .card {
+    position: relative;
+    width: 105mm; height: 148mm;
+    padding: 7mm 6.5mm 5.5mm;
+    display: flex; flex-direction: column;
+    /* hairline trim guide — cut along it and the line goes with the offcut */
+    outline: 0.3pt dashed #b0b0b0;
+  }
+
+  /* ---- header ---- */
+  header { border-bottom: 1.4pt solid #000; padding-bottom: 2mm; margin-bottom: 4mm; }
+  h1 { font-size: 13pt; font-weight: 700; letter-spacing: -0.3pt; }
+  .prefix {
+    display: flex; align-items: baseline; gap: 1.5mm;
+    margin-top: 1.8mm; font-size: 7.6pt; color: #333;
+  }
+  .prefix b { font-size: 8.4pt; color: #000; }
+
+  /* ---- sections ---- */
+  section { margin-bottom: 4.5mm; }
+  h2 {
+    font-size: 7pt; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.9pt; color: #000;
+    padding-bottom: 1.2mm; margin-bottom: 1.8mm;
+    border-bottom: 0.6pt solid #000;
+  }
+  h2 span { font-weight: 400; text-transform: none; letter-spacing: 0; color: #666; }
+
+  /* ---- rows ---- */
+  .row {
+    display: flex; align-items: baseline; gap: 2mm;
+    padding: 1.9mm 0;
+    border-bottom: 0.4pt solid #d5d5d5;
+  }
+  .row:last-child { border-bottom: none; }
+  .act { flex: 1 1 auto; font-size: 8.4pt; line-height: 1.15; }
+  .keys { flex: 0 0 auto; text-align: right; white-space: nowrap; }
+
+  /* ---- key caps ---- */
+  kbd {
+    font-family: "CommitMono", "SF Mono", Menlo, monospace;
+    font-size: 8.2pt; font-weight: 600; line-height: 1;
+    display: inline-block; padding: 0.85mm 1.3mm;
+    border: 0.6pt solid #000; border-radius: 0.8mm;
+    background: #fff;
+  }
+  .then { font-size: 6.4pt; color: #777; padding: 0 0.5mm; font-style: italic; }
+  .or   { font-size: 6.4pt; color: #777; padding: 0 0.8mm; }
+
+  /* ---- footer notes ---- */
+  footer { margin-top: auto; border-top: 0.6pt solid #000; padding-top: 2mm; }
+  .note { font-size: 6.5pt; line-height: 1.35; color: #333; display: flex; gap: 1.5mm; }
+  .note + .note { margin-top: 1.2mm; }
+  .note .mk { flex: 0 0 auto; font-weight: 700; color: #000; }
+  .note code {
+    font-family: "CommitMono", "SF Mono", Menlo, monospace;
+    font-size: 6.5pt; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <header>
+    <h1>tmux — panes &amp; windows</h1>
+    <div class="prefix">prefix is <b><kbd>⌃</kbd> <kbd>Space</kbd></b> &nbsp;·&nbsp; ijkl = ↑ ← ↓ →</div>
+  </header>
+
+  <section>
+    <h2>Panes <span>— inside one window</span></h2>
+
+    <div class="row">
+      <div class="act">Split side-by-side</div>
+      <div class="keys">
+        <kbd>⌃Space</kbd><span class="then">then</span><kbd>\</kbd><span class="or">or</span><kbd>⌥\</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Split stacked</div>
+      <div class="keys">
+        <kbd>⌃Space</kbd><span class="then">then</span><kbd>-</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Focus left / down / up / right</div>
+      <div class="keys">
+        <kbd>⌃Space</kbd><span class="then">then</span><kbd>j</kbd><kbd>k</kbd><kbd>i</kbd><kbd>l</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Resize <span style="color:#777">(repeatable *)</span></div>
+      <div class="keys">
+        <kbd>⌃Space</kbd><span class="then">then</span><kbd>⌃j</kbd><kbd>⌃k</kbd><kbd>⌃i</kbd><kbd>⌃l</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Close pane</div>
+      <div class="keys">
+        <kbd>⌃Space</kbd><span class="then">then</span><kbd>x</kbd><span class="or">or</span><kbd>exit</kbd>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Windows <span>— the tabs in your status bar</span></h2>
+
+    <div class="row">
+      <div class="act">New window</div>
+      <div class="keys">
+        <kbd>⌥c</kbd><span class="or">or</span><kbd>⌃Space</kbd><span class="then">then</span><kbd>c</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Jump to window 1–9</div>
+      <div class="keys">
+        <kbd>⌥1</kbd><span class="or">…</span><kbd>⌥9</kbd>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="act">Next / previous</div>
+      <div class="keys">
+        <kbd>⌥⇧→</kbd><kbd>⌥⇧←</kbd>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="note">
+      <span class="mk">*</span>
+      <span>Resize is <code>bind -r</code> — after the first <code>⌃Space ⌃l</code>, keep tapping
+      <code>⌃l</code> without the prefix.</span>
+    </div>
+    <div class="note">
+      <span class="mk">!</span>
+      <span>Bare <code>⌥-</code> is swallowed by AeroSpace (window resize) — always use the
+      prefix for a stacked split.</span>
+    </div>
+    <div class="note">
+      <span class="mk">↑</span>
+      <span>New panes &amp; windows inherit the current directory.</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

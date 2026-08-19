@@ -1,6 +1,20 @@
-working-directory = /Users/apurvashukla/code
+working-directory = /Users/apurvashukla/code/sumble
 window-inherit-working-directory = false
-command = /opt/homebrew/bin/tmux new-session -A -s main
+
+# --- Multiplexer ---
+# Herdr is the outer multiplexer, replacing the previous
+# `tmux new-session -A -s main`. Its keybindings in
+# new-laptop-setup/herdr/config.toml mirror the tmux vocabulary:
+# prefix Ctrl+Space, `-` / `|` to split, `c` for a new tab, IJKL to
+# move between panes. Herdr keeps a persistent background server, so
+# closing this window leaves pane processes running and the next
+# window re-attaches.
+#
+# tmux is still installed and ~/.tmux.conf is untouched. For a plain
+# shell or a tmux window that bypasses Herdr:
+#   open -na Ghostty --args -e /bin/zsh -l
+#   open -na Ghostty --args -e /opt/homebrew/bin/tmux new-session -A -s main
+command = /opt/homebrew/bin/herdr
 # --- Visuals & Theme ---
 # "catppuccin-mocha" is a very popular, high-contrast pastel dark theme
 theme = catppuccin-mocha
@@ -50,4 +64,3 @@ keybind = cmd+delete=text:\x0b
 # This one makes Option+Backspace delete the word to the left
 keybind = alt+backspace=text:\x17
 keybind = shift+enter=text:\x1b\r
-

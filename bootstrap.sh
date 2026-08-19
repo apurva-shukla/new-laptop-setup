@@ -14,7 +14,7 @@ Idempotent setup for this repository:
 - creates/updates symlinks
 - adds one-time includes for zshrc and gitconfig
 - creates local secret files from templates when missing
-- starts yabai/skhd/sketchybar services (optional)
+- starts Herdr and desktop services (optional)
 EOF
 }
 
@@ -83,6 +83,7 @@ mkdir -p "$HOME/Library/LaunchAgents"
 
 link_item "$REPO_DIR/aerospace" "$CONFIG_HOME/aerospace"
 link_item "$REPO_DIR/ghostty" "$CONFIG_HOME/ghostty"
+link_item "$REPO_DIR/herdr/config.toml" "$CONFIG_HOME/herdr/config.toml"
 link_item "$REPO_DIR/skhd" "$CONFIG_HOME/skhd"
 link_item "$REPO_DIR/yabai" "$CONFIG_HOME/yabai"
 link_item "$REPO_DIR/zed" "$CONFIG_HOME/zed"
@@ -113,6 +114,9 @@ copy_if_missing "$REPO_DIR/raycast/config.example.json" "$REPO_DIR/raycast/confi
 copy_if_missing "$REPO_DIR/bettertouchtool/bettertouchtool.bttlicense.example" "$REPO_DIR/bettertouchtool/bettertouchtool.bttlicense"
 
 if [ "$SKIP_SERVICES" = false ]; then
+  if command -v herdr >/dev/null 2>&1; then
+    brew services start herdr || true
+  fi
   if command -v yabai >/dev/null 2>&1; then
     yabai --start-service || true
   fi
