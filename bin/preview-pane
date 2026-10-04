@@ -1,0 +1,53 @@
+#!/bin/bash
+# Show a file in the shared preview pane.
+#
+# Under Herdr (the current setup) this finds the pane labeled "preview",
+# creating it on the right if it doesn't exist yet, and renders the file
+# there with ~/bin/preview. Under tmux it falls back to the old fixed
+# pane %1 used by ~/bin/tmux-work.
+#
+# Usage: preview-pane <path>
+
+set -euo pipefail
+
+target="${1:-}"
+if [ -z "$target" ]; then
+  echo "usage: preview-pane <path>" >&2
+  exit 2
+fi
+if [ ! -e "$target" ]; then
+  echo "preview-pane: no such file: $target" >&2
+  exit 1
+fi
+target="$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
+
+# tmux fallback: preserve the historical `tmux-work` layout.
+if [ -n "${TMUX:-}" ]; then
+  tmux send-keys -t %1 'q' C-m "preview \"$target\"" C-m
+  exit 0
+fi
+
+if ! command -v herdr >/dev/null 2>&1; then
+  echo "preview-pane: neither tmux nor herdr is available" >&2
+  exit 1
+fi
+
+pane="$(herdr pane list | jq -r '[.result.panes[] | select(.label == "preview") | .pane_id][0] // empty')"
+
+if [ -z "$pane" ]; then
+  pane="$(herdr pane split --current --direction right --ratio 0.4 --cwd "$HOME" \
+            | jq -r '.result.pane.pane_id')"
+  herdr pane rename "$pane" preview >/dev/null
+fi
+
+# `preview` itself never pages (it uses --paging=never), so only send `q`
+# when something else is actually holding the pane in the foreground.
+fg="$(herdr pane process-info --pane "$pane" \
+        | jq -r '.result.process_info.foreground_processes[-1].name // empty')"
+if [ -n "$fg" ] && [ "$fg" != "$(basename "${SHELL:-zsh}")" ]; then
+  herdr pane send-keys "$pane" q >/dev/null 2>&1 || true
+fi
+
+# Clear any half-typed input so it can't prefix the command.
+herdr pane send-keys "$pane" ctrl+u >/dev/null 2>&1 || true
+herdr pane run "$pane" preview "$target"

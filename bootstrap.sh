@@ -86,10 +86,14 @@ link_item "$REPO_DIR/ghostty" "$CONFIG_HOME/ghostty"
 link_item "$REPO_DIR/herdr/config.toml" "$CONFIG_HOME/herdr/config.toml"
 link_item "$REPO_DIR/skhd" "$CONFIG_HOME/skhd"
 link_item "$REPO_DIR/yabai" "$CONFIG_HOME/yabai"
-link_item "$REPO_DIR/zed" "$CONFIG_HOME/zed"
+link_item "$REPO_DIR/zed/settings.json" "$CONFIG_HOME/zed/settings.json"
+link_item "$REPO_DIR/zed/keymap.json" "$CONFIG_HOME/zed/keymap.json"
 link_item "$REPO_DIR/launchagents/com.apurvashukla.current-space-menu.plist" "$HOME/Library/LaunchAgents/com.apurvashukla.current-space-menu.plist"
 link_item "$REPO_DIR/starship/starship.toml" "$CONFIG_HOME/starship.toml"
 link_item "$REPO_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+for script in "$REPO_DIR"/bin/*; do
+  link_item "$script" "$HOME/bin/$(basename "$script")"
+done
 
 append_if_missing "$HOME/.zshrc" "source \"$REPO_DIR/zshrc\""
 

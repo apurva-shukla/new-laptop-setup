@@ -1,0 +1,138 @@
+#!/bin/bash
+# Terminal file previewer for tmux preview pane
+# Supports: .md, .pdf, .docx, .xlsx, .pptx, .csv, .json, .txt, and code files
+
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: preview <file>"
+  exit 1
+fi
+
+FILE="$1"
+
+if [ ! -f "$FILE" ]; then
+  echo "File not found: $FILE"
+  exit 1
+fi
+
+EXT="${FILE##*.}"
+EXT="$(echo "$EXT" | tr '[:upper:]' '[:lower:]')"
+
+clear
+
+echo "━━━ $(basename "$FILE") ━━━"
+echo ""
+
+case "$EXT" in
+  md)
+    # Prefer glow > bat > cat
+    if command -v glow &>/dev/null; then
+      glow -w 80 "$FILE"
+    elif command -v bat &>/dev/null; then
+      bat --style=plain --paging=never "$FILE"
+    else
+      cat "$FILE"
+    fi
+    ;;
+
+  pdf)
+    if command -v pdftotext &>/dev/null; then
+      pdftotext -layout "$FILE" -
+    elif python3 -c "import fitz" 2>/dev/null; then
+      python3 -c "
+import fitz, sys
+doc = fitz.open('$FILE')
+for page in doc:
+    print(page.get_text())
+    print('--- Page', page.number + 1, '---')
+"
+    else
+      echo "[Install poppler (brew install poppler) or pymupdf for PDF preview]"
+      file "$FILE"
+    fi
+    ;;
+
+  docx)
+    if command -v pandoc &>/dev/null; then
+      pandoc -t plain "$FILE"
+    elif python3 -c "import docx" 2>/dev/null; then
+      python3 -c "
+from docx import Document
+doc = Document('$FILE')
+for p in doc.paragraphs:
+    print(p.text)
+"
+    else
+      echo "[Install pandoc (brew install pandoc) for DOCX preview]"
+    fi
+    ;;
+
+  xlsx|xls)
+    if python3 -c "import openpyxl" 2>/dev/null; then
+      python3 -c "
+import openpyxl
+wb = openpyxl.load_workbook('$FILE', read_only=True)
+for sheet_name in wb.sheetnames:
+    ws = wb[sheet_name]
+    print(f'\n=== {sheet_name} ===')
+    for i, row in enumerate(ws.iter_rows(values_only=True)):
+        if i > 50:
+            print(f'... ({ws.max_row - 50} more rows)')
+            break
+        print('\t'.join(str(c) if c is not None else '' for c in row))
+"
+    elif command -v csvkit &>/dev/null; then
+      in2csv "$FILE" | head -60 | column -t -s,
+    else
+      echo "[Install openpyxl (pip install openpyxl) for XLSX preview]"
+    fi
+    ;;
+
+  pptx)
+    if python3 -c "from pptx import Presentation" 2>/dev/null; then
+      python3 -c "
+from pptx import Presentation
+prs = Presentation('$FILE')
+for i, slide in enumerate(prs.slides, 1):
+    print(f'\n=== Slide {i} ===')
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for p in shape.text_frame.paragraphs:
+                if p.text.strip():
+                    print(p.text)
+"
+    elif command -v pandoc &>/dev/null; then
+      pandoc -t plain "$FILE"
+    else
+      echo "[Install python-pptx (pip install python-pptx) for PPTX preview]"
+    fi
+    ;;
+
+  csv)
+    if command -v bat &>/dev/null; then
+      bat --style=plain --paging=never "$FILE" | head -60
+    else
+      column -t -s, "$FILE" | head -60
+    fi
+    ;;
+
+  json)
+    if command -v jq &>/dev/null; then
+      jq '.' "$FILE" | head -80
+    elif command -v bat &>/dev/null; then
+      bat --style=plain --paging=never "$FILE"
+    else
+      python3 -m json.tool "$FILE" | head -80
+    fi
+    ;;
+
+  *)
+    # Code files and everything else
+    if command -v bat &>/dev/null; then
+      bat --style=plain --paging=never "$FILE"
+    else
+      cat "$FILE" | head -100
+    fi
+    ;;
+esac

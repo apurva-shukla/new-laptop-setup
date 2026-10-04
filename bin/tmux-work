@@ -1,0 +1,39 @@
+#!/bin/bash
+# Launch 4 Claude Code agents in a 2x2 grid with a shared preview panel
+# Layout:
+#   %0 | %3 || %1 (preview)
+#   ---------||
+#   %2 | %4 || %1 (preview)
+
+tmux kill-server 2>/dev/null
+
+# Create session with generous dimensions
+tmux new-session -s work -d -x 300 -y 80
+
+# Split right panel for preview (40% width)
+tmux split-window -h -p 40 -t work
+
+# Go to left pane and split into top/bottom
+tmux select-pane -t %0
+tmux split-window -v -p 50
+
+# Split top-left into two columns
+tmux select-pane -t %0
+tmux split-window -h -p 50
+
+# Split bottom-left into two columns
+tmux select-pane -t %2
+tmux split-window -h -p 50
+
+# Label the preview pane
+tmux send-keys -t %1 'echo "═══ PREVIEW PANE ═══ (agents will send files here)"' Enter
+
+# Launch Claude Code in all 4 agent panes
+for pane in %0 %2 %3 %4; do
+  tmux send-keys -t "$pane" 'claude --dangerously-skip-permissions' Enter
+done
+
+# Focus top-left agent
+tmux select-pane -t %0
+
+tmux attach -t work
