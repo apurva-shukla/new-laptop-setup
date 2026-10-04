@@ -108,17 +108,9 @@ cask "zoom"
 cask "bambu-studio"
 cask "capcut"
 cask "claude"
-cask "conductor"
-cask "darktable"
-cask "granola"
 cask "magicquit"
-cask "quitter"
-cask "roam"
 cask "stremio"
-cask "superset"
-cask "tella"
-cask "zo"
 
 # No Homebrew cask. Install these by hand:
-# Dropover, Fireflies, Hyprnote, Nicotine+, Paper (the design app), Photomator, Sand, Supercut
+# Dropover, Fireflies, Hyprnote, Nicotine+, Paper (the design app), Photomator
 # Claude Code uses its native installer (~/.local/bin/claude), not the cask.
