@@ -72,3 +72,9 @@ esac
 # --- Secrets (API keys, tokens) and machine-only settings stay out of this repo ---
 # ~/.zshrc sources this file, then adds anything personal below that line.
 [[ -f ~/.zsh_secrets ]] && source ~/.zsh_secrets
+
+# Herdr panes start in the focused pane's directory; fresh ones that land
+# at ~ or / default to ~/code/modal instead.
+if [[ -n "$HERDR_ENV" && ( "$PWD" == "$HOME" || "$PWD" == "/" ) && -d ~/code/modal ]]; then
+  cd ~/code/modal
+fi

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# Port of ~/.config/skhd/move_to_next_free_space.sh for AeroSpace.
+# Move the focused window to the next empty AeroSpace workspace.
 # Moves the focused window to the next empty workspace (after the current one,
 # wrapping around) and follows it. Notifies if every workspace is occupied.
 

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# Port of ~/.config/skhd/space_overview.sh for AeroSpace.
+# Show an overview of AeroSpace workspaces.
 # Shows a notification listing free vs busy workspaces (with window counts).
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"

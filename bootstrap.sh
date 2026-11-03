@@ -84,11 +84,8 @@ mkdir -p "$HOME/Library/LaunchAgents"
 link_item "$REPO_DIR/aerospace" "$CONFIG_HOME/aerospace"
 link_item "$REPO_DIR/ghostty" "$CONFIG_HOME/ghostty"
 link_item "$REPO_DIR/herdr/config.toml" "$CONFIG_HOME/herdr/config.toml"
-link_item "$REPO_DIR/skhd" "$CONFIG_HOME/skhd"
-link_item "$REPO_DIR/yabai" "$CONFIG_HOME/yabai"
 link_item "$REPO_DIR/zed/settings.json" "$CONFIG_HOME/zed/settings.json"
 link_item "$REPO_DIR/zed/keymap.json" "$CONFIG_HOME/zed/keymap.json"
-link_item "$REPO_DIR/launchagents/com.apurvashukla.current-space-menu.plist" "$HOME/Library/LaunchAgents/com.apurvashukla.current-space-menu.plist"
 link_item "$REPO_DIR/starship/starship.toml" "$CONFIG_HOME/starship.toml"
 link_item "$REPO_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 for script in "$REPO_DIR"/bin/*; do
@@ -121,14 +118,6 @@ if [ "$SKIP_SERVICES" = false ]; then
   if command -v herdr >/dev/null 2>&1; then
     brew services start herdr || true
   fi
-  if command -v yabai >/dev/null 2>&1; then
-    yabai --start-service || true
-  fi
-  if command -v skhd >/dev/null 2>&1; then
-    skhd --start-service || true
-  fi
-  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.apurvashukla.current-space-menu.plist" >/dev/null 2>&1 || true
-  launchctl kickstart -k "gui/$(id -u)/com.apurvashukla.current-space-menu" >/dev/null 2>&1 || true
 fi
 
 echo "Done."

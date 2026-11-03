@@ -1,4 +1,4 @@
-working-directory = /Users/apurvashukla/code/sumble
+working-directory = /Users/modal/code/modal
 window-inherit-working-directory = false
 
 # --- Multiplexer ---
@@ -39,9 +39,9 @@ window-padding-x = 10
 window-padding-y = 10
 window-padding-balance = true
 
-# --- Minimalist UI (Yabai Style) ---
+# --- Minimalist UI (tiling WM) ---
 # Hides the macOS title bar (stoplights). 
-# Since you use Yabai, you don't need the title bar taking up space.
+# With a tiling window manager you don't need the title bar taking up space.
 macos-titlebar-style = transparent
 
 # --- Cursor ---

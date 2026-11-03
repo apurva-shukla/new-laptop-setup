@@ -1,12 +1,12 @@
 # AeroSpace config — simplified 2026-07-11.
-# Previous (full yabai-port) config: aerospace.toml.full-backup
+# Previous (fuller) config: aerospace.toml.full-backup
 #
 # The whole mental model:
 #   - 4 context workspaces, cmd-1..4 to go there, alt-shift-1..4 to send a window there
 #   - left monitor: 1-left and 2-comms; right monitor: 3-work and 4-flex
 #   - alt-j/k/i/l moves focus, add shift to move the window
 #   - alt-a stacks windows fullscreen-style (accordion), alt-b un-stacks to tiles
-#   - alt-r fixes any weird layout
+#   - alt-r rotates the split (side-by-side <-> stacked), alt-shift-r fixes any weird layout
 #   - never use the green fullscreen button
 
 config-version = 2
@@ -47,8 +47,9 @@ outer.right = 4
 [workspace-to-monitor-force-assignment]
 # Prefer the two desk monitors by exact model name. The role fallbacks keep all
 # workspaces reachable with a different two-monitor setup or only one display.
-"1-left" = ['^DELL S2725QC$', 'secondary', 'main']
-"2-comms" = ['^DELL S2725QC$', 'secondary', 'main']
+# LG HDR 4K + laptop setup: 1/2 go on the LG, 3/4 fall back to the laptop.
+"1-left" = ['^DELL S2725QC$', '^LG HDR 4K$', 'secondary', 'main']
+"2-comms" = ['^DELL S2725QC$', '^LG HDR 4K$', 'secondary', 'main']
 "3-work" = ['^DELL U2725QE$', 'main']
 "4-flex" = ['^DELL U2725QE$', 'main']
 
@@ -72,7 +73,8 @@ alt-shift-period = 'move-node-to-monitor --focus-follows-window --wrap-around ne
 alt-a = 'layout accordion'
 alt-b = 'layout tiles'
 alt-f = 'layout floating tiling'
-alt-r = 'flatten-workspace-tree'
+alt-r = 'layout tiles horizontal vertical'
+alt-shift-r = 'flatten-workspace-tree'
 
 # resize focused window
 alt-minus = 'resize smart -50'

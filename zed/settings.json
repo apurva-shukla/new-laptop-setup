@@ -29,7 +29,7 @@
   "ui_font_family": "CommitMono",
   "ui_font_size": 14.0,
 
-  // === MINIMALIST UI (Match Yabai aesthetic) ===
+  // === MINIMALIST UI (match tiling WM aesthetic) ===
   "tab_bar": {
     "show": true,
     "show_nav_history_buttons": false,

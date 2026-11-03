@@ -65,14 +65,12 @@ brew "sleuth-io/tap/sx", trusted: true
 cask "1password"
 cask "nikitabobko/tap/aerospace", trusted: true
 cask "bettermouse"
-cask "bettertouchtool"
 cask "bruno"
 cask "chatgpt"
 cask "codex"
 cask "cursor"
 cask "db-browser-for-sqlite"
 cask "dbeaver-community"
-cask "docker-desktop"
 cask "figma"
 cask "font-hack-nerd-font"
 cask "font-meslo-lg-nerd-font"
@@ -105,11 +103,11 @@ cask "zen"
 cask "zoom"
 
 # Installed by hand on the current Mac, but Homebrew has a cask for them
-cask "bambu-studio"
-cask "capcut"
 cask "claude"
+cask "granola"
+cask "keepassxc"
+cask "snowflake-snowsql"
 cask "magicquit"
-cask "stremio"
 
 # No Homebrew cask. Install these by hand:
 # Dropover, Fireflies, Hyprnote, Nicotine+, Paper (the design app), Photomator
