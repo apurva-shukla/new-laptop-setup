@@ -33,7 +33,7 @@ Dotfiles and config for macOS dev environment. Idempotent bootstrap script symli
 
 ### Ghostty
 - CommitMono font, size 14, 0.90 opacity
-- Auto-launches tmux on open
+- Launches Herdr on open (tmux stays installed as a fallback)
 - macOS-style keybindings (Cmd+C/V for copy/paste)
 
 ## Bootstrap

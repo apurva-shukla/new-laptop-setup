@@ -1,6 +1,4 @@
-tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
 tap "elevenlabs/tap"
-tap "felixkratz/formulae"
 tap "ngrok/ngrok"
 tap "nikitabobko/tap"
 tap "openclaw/tap"

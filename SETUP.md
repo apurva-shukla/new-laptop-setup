@@ -2,18 +2,20 @@
 
 ## Order of Operations
 
-1. **Run Sumble dev setup script**
+1. **Install Homebrew** (also installs the Xcode command line tools, which include git)
    ```bash
-   source <(curl -fsSL https://setup.sumble.com)
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   eval "$(/opt/homebrew/bin/brew shellenv)"
    ```
-   This installs: pyenv, nvm, gcloud, sumble CLI, and work dependencies.
 
 2. **Clone this repo**
    ```bash
-   cd ~/code/personal/new-laptop-setup
+   mkdir -p ~/code/personal && cd ~/code/personal
+   git clone https://github.com/apurva-shukla/new-laptop-setup.git
+   cd new-laptop-setup
    ```
 
-3. **Run idempotent bootstrap**
+3. **Run idempotent bootstrap** (installs Homebrew packages, including pyenv, nvm, uv and gcloud)
    ```bash
    chmod +x ./bootstrap.sh
    ./bootstrap.sh

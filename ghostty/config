@@ -1,4 +1,4 @@
-working-directory = /Users/modal/code/modal
+working-directory = home
 window-inherit-working-directory = false
 
 # --- Multiplexer ---

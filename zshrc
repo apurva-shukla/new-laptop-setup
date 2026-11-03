@@ -42,7 +42,7 @@ alias rm="rm -i"
 # Add local binaries (needed for uv, pipx, etc). ~/bin holds the scripts in bin/.
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
-# === SUMBLE SETUP ===
+# === Python (pyenv) and Node (nvm) ===
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
@@ -51,12 +51,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# sumble cli (installed by `source <(curl -fsSL https://setup.sumble.com)`)
-if [ -d /usr/local/sumble-cli ]; then
-  export PATH=/usr/local/sumble-cli:${PATH}
-  source /usr/local/sumble-cli/completions.sh
-fi
 
 # YNAB CLI
 alias ynab="python3 $HOME/code/personal/financial-planning/ynab/cli.py"
