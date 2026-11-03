@@ -85,7 +85,7 @@ cask "loom"
 cask "ngrok"
 cask "notion"
 cask "obsidian"
-cask "openscreen"
+cask "siddharthvaddem/openscreen/openscreen", trusted: true
 cask "raycast"
 cask "screen-studio"
 cask "shottr"
