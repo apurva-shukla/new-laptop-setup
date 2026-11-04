@@ -115,6 +115,15 @@ fi
 copy_if_missing "$REPO_DIR/raycast/config.example.json" "$REPO_DIR/raycast/config.json"
 copy_if_missing "$REPO_DIR/bettertouchtool/bettertouchtool.bttlicense.example" "$REPO_DIR/bettertouchtool/bettertouchtool.bttlicense"
 
+# Free ctrl-left/right for AeroSpace: turn off Mission Control's
+# "Move left/right a space" shortcuts (79-82), which macOS enables by default.
+for hotkey in 79 80 81 82; do
+  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+    -dict-add "$hotkey" '<dict><key>enabled</key><false/></dict>'
+done
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
+echo "Disabled Mission Control ctrl-arrow space shortcuts"
+
 if [ "$SKIP_SERVICES" = false ]; then
   if command -v herdr >/dev/null 2>&1; then
     brew services start herdr || true
