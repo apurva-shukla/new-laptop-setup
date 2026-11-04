@@ -4,7 +4,9 @@
 # New installs start with the roomy rounded sidebar. Remove this line for
 # the managed default, or pick another layout listed in config-gpui.toml.
 layout = "comfortable-rounded"
-theme = "Follow Herdr"
+theme = "Abernathy"
+confirm_close_pane = false
+favorite_themes = ["Fahrenheit", "0x96f", "Abernathy"]
 
 [palette]
 project_roots = ["~/code"]

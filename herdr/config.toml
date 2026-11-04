@@ -25,3 +25,7 @@ navigate_pane_right = "l"
 
 [ui]
 agent_panel_sort = "priority"
+
+[terminal]
+# Open new panes, tabs, and workspaces in modal-etl unless --cwd is given.
+new_cwd = "~/code/modal-etl"
