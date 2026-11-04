@@ -32,11 +32,14 @@
    ```
    Then fill in your real values locally. These files are ignored by git.
 
-5. **Apply macOS defaults (optional, review before running)**
+5. **Apply macOS defaults**
    ```bash
    chmod +x ./macos-defaults.sh
-   ./macos-defaults.sh --allow-insecure
+   ./macos-defaults.sh                    # faster animations and key repeat
+   ./macos-defaults.sh --allow-insecure   # also disables Gatekeeper (review first)
    ```
+   Then log out and back in for key repeat. Turn on Reduce Transparency by hand in
+   System Settings → Accessibility → Display (scripts can't change it).
 
 6. **Read secret rotation checklist if migrating from old repo state**
    - `SECURITY-ROTATION.md`
