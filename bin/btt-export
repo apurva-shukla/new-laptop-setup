@@ -1,0 +1,60 @@
+#!/bin/bash
+# Export the "Apurva" BetterTouchTool preset into this repo.
+#
+# Runs hourly from launchagents/com.apurva.btt-export.plist. Skips when BTT
+# isn't running, and only rewrites the file when the preset actually changed.
+# BTT gives the preset a new UUID on every export, so the repo's UUID is kept.
+#
+# Usage: btt-export
+
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+PRESET_NAME="Apurva"
+TARGET="$REPO_DIR/bettertouchtool/my-preset.bttpreset"
+
+# Talking to BTT through osascript would launch it, so bail out instead.
+if ! pgrep -xq BetterTouchTool; then
+  echo "btt-export: BetterTouchTool isn't running, skipping"
+  exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+osascript -e "tell application \"BetterTouchTool\" to export_preset \"$PRESET_NAME\" outputPath \"$tmp/export.bttpreset\" compress false includeSettings true" >/dev/null
+
+# BTT writes the file asynchronously; wait until it exists and stops growing.
+last_size=-1
+for _ in $(seq 1 20); do
+  sleep 0.5
+  size="$(stat -f %z "$tmp/export.bttpreset" 2>/dev/null || echo 0)"
+  if [ "$size" -gt 0 ] && [ "$size" = "$last_size" ]; then
+    break
+  fi
+  last_size="$size"
+done
+
+if [ ! -s "$tmp/export.bttpreset" ]; then
+  echo "btt-export: export produced no file (is the preset named $PRESET_NAME?)" >&2
+  exit 1
+fi
+
+if [ -f "$TARGET" ]; then
+  uuid_line="$(grep -m1 '"BTTPresetUUID"' "$TARGET" || true)"
+  if [ -n "$uuid_line" ]; then
+    grep -v '"BTTPresetUUID"' "$tmp/export.bttpreset" > "$tmp/new" || true
+    grep -v '"BTTPresetUUID"' "$TARGET" > "$tmp/old" || true
+    if cmp -s "$tmp/new" "$tmp/old"; then
+      echo "btt-export: no changes"
+      exit 0
+    fi
+    # Keep the repo's UUID so diffs only show real changes.
+    awk -v keep="$uuid_line" '/"BTTPresetUUID"/ { print keep; next } { print }' \
+      "$tmp/export.bttpreset" > "$tmp/fixed"
+    mv "$tmp/fixed" "$tmp/export.bttpreset"
+  fi
+fi
+
+mv "$tmp/export.bttpreset" "$TARGET"
+echo "btt-export: updated $TARGET"

@@ -128,6 +128,13 @@ if [ "$SKIP_SERVICES" = false ]; then
   if command -v herdr >/dev/null 2>&1; then
     brew services start herdr || true
   fi
+
+  # Hourly export of the BTT preset into this repo (see bin/btt-export).
+  btt_agent="$HOME/Library/LaunchAgents/com.apurva.btt-export.plist"
+  cp "$REPO_DIR/launchagents/com.apurva.btt-export.plist" "$btt_agent"
+  launchctl bootout "gui/$(id -u)" "$btt_agent" 2>/dev/null || true
+  launchctl bootstrap "gui/$(id -u)" "$btt_agent"
+  echo "Loaded $btt_agent"
 fi
 
 echo "Done."

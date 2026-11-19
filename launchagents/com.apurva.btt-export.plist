@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.apurva.btt-export</string>
+
+  <!-- Goes through bash so $HOME resolves; bootstrap links btt-export into ~/bin. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>"$HOME/bin/btt-export"</string>
+  </array>
+
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/btt-export.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/btt-export.err</string>
+</dict>
+</plist>
