@@ -28,6 +28,12 @@ defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
+# Free the three-finger horizontal swipe for BTT, which maps it to AeroSpace
+# workspaces. Four-finger swipes still switch macOS Spaces.
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int 0
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture -int 0
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerHorizSwipeGesture -int 0
+
 echo "Applied speed defaults."
 
 if [ "${1:-}" != "--allow-insecure" ]; then
