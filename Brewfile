@@ -76,7 +76,7 @@ cask "gcloud-cli"
 cask "ghostty"
 cask "github"
 cask "google-chrome"
-cask "penso/tap/herdr-gpui", trusted: true
+cask "sheprd-labs/tap/sheprd", trusted: true
 cask "homerow"
 cask "itsycal"
 cask "jordanbaird-ice"
